@@ -9,7 +9,7 @@ jobs:
   cut-gh-release:
     runs-on: ubuntu-latest
     env:
-      DOCKER_IMAGE: us-east4-docker.pkg.dev/spoke-rewired/spoke/core
+      DOCKER_IMAGE: us-west1-docker.pkg.dev/spoke-407503/spoke/core
       BODY_PATH: release-body.txt
     steps:
       - name: Checkout
