@@ -10,6 +10,7 @@ import { makeNumbersClient } from "../../lib/assemble-numbers";
 import { r } from "../../models";
 import statsd from "../../statsd";
 import { errToObj } from "../../utils";
+import { getOrgFeature } from "../organization-settings";
 import type { MessagingServiceRecord, RequestHandlerFactory } from "../types";
 import { MessagingServiceType } from "../types";
 import { symmetricDecrypt } from "./crypto";
@@ -179,13 +180,13 @@ export const sendMessage = async (
     .where({ id: campaignContactId })
     .first("zip");
 
-  const { maxSmsSegmentLength } = await r
+  const { features } = await r
     .reader("organization")
     .where({ id: organizationId })
     .first("features")
-    .then(({ features }) => JSON.parse(features))
     .catch(() => ({}));
 
+  const maxSmsSegmentLength = getOrgFeature("maxSmsSegmentLength", features);
   const { body, mediaUrl } = messageComponents(messageText);
 
   const mediaUrls = mediaUrl
