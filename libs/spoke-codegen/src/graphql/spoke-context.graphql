@@ -20,4 +20,5 @@ fragment OrganizationSettingsInfo on OrganizationSettings {
   scriptPreviewForSupervolunteers
   defaultCampaignBuilderMode
   defaultAutosendingControlsMode
+  maxSmsSegmentLength
 }

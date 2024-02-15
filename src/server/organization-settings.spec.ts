@@ -37,7 +37,8 @@ describe("get organization settings", () => {
     defaultAutosendingControlsMode: AutosendingControlsMode.Basic,
     defaulTexterApprovalStatus: RequestAutoApproveType.APPROVAL_REQUIRED,
     numbersApiKey: "SomethingSecret",
-    trollbotWebhookUrl: "https://rewired.coop/trolls"
+    trollbotWebhookUrl: "https://rewired.coop/trolls",
+    maxSmsSegmentLength: 3
   };
 
   const makeSettingsRequest = async (
@@ -68,6 +69,7 @@ describe("get organization settings", () => {
                 defaulTexterApprovalStatus
                 numbersApiKey
                 trollbotWebhookUrl
+                maxSmsSegmentLength
               }
             }
           }
@@ -135,6 +137,7 @@ describe("get organization settings", () => {
     );
     expect(settings.numbersApiKey).not.toBeNull();
     expect(settings.trollbotWebhookUrl).toEqual(features.trollbotWebhookUrl);
+    expect(settings.maxSmsSegmentLength).toEqual(features.maxSmsSegmentLength);
   });
 
   it("returns the correct role required", () => {
