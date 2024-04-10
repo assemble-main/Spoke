@@ -13,6 +13,7 @@ export const schema = `
     showDoNotAssignMessage: Boolean
     doNotAssignMessage: String
     defaultAutosendingControlsMode: AutosendingControlsMode
+    maxSmsSegmentLength: Int
 
     # Superadmin
     startCampaignRequiresApproval: Boolean
@@ -28,6 +29,7 @@ export const schema = `
     confirmationClickForScriptLinks: Boolean!
     showDoNotAssignMessage: Boolean!
     doNotAssignMessage: String!
+    maxSmsSegmentLength: Int
 
     # Supervolunteer
     startCampaignRequiresApproval: Boolean

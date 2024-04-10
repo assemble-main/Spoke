@@ -1,12 +1,12 @@
 {
   "name": "spoke",
-  "version": "7.3.0",
+  "version": "8.0.1",
   "description": "Spoke",
   "main": "src/server",
   "engines": {
     "npm": "please-use-yarn",
     "yarn": ">= 1.19.1",
-    "node": "^16.14.0"
+    "node": "^18.16.0"
   },
   "scripts": {
     "preinstall": "node -e \"if(process.env.npm_execpath.indexOf('yarn') === -1) throw new Error('spoke must be installed with Yarn: https://yarnpkg.com/')\"",
@@ -129,7 +129,7 @@
     "graphql-type-json": "^0.3.2",
     "graphql-upload": "^13.0.0",
     "history": "^5.0.0",
-    "hot-shots": "^8.3.0",
+    "hot-shots": "^10.0.0",
     "humps": "^1.1.0",
     "iconv-lite": "^0.5.1",
     "immer": "^8.0.1",

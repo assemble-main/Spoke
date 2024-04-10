@@ -28,6 +28,7 @@ interface IOrganizationSettings {
   doNotAssignMessage: string;
   defaultCampaignBuilderMode: CampaignBuilderMode;
   defaultAutosendingControlsMode: AutosendingControlsMode;
+  maxSmsSegmentLength: number | null;
 }
 
 const SETTINGS_PERMISSIONS: {
@@ -45,7 +46,8 @@ const SETTINGS_PERMISSIONS: {
   defaultAutosendingControlsMode: UserRoleType.ADMIN,
   defaulTexterApprovalStatus: UserRoleType.OWNER,
   numbersApiKey: UserRoleType.OWNER,
-  trollbotWebhookUrl: UserRoleType.OWNER
+  trollbotWebhookUrl: UserRoleType.OWNER,
+  maxSmsSegmentLength: UserRoleType.TEXTER
 };
 
 const SETTINGS_WRITE_PERMISSIONS: {
@@ -63,7 +65,8 @@ const SETTINGS_WRITE_PERMISSIONS: {
   showDoNotAssignMessage: UserRoleType.OWNER,
   doNotAssignMessage: UserRoleType.OWNER,
   defaultAutosendingControlsMode: UserRoleType.OWNER,
-  startCampaignRequiresApproval: UserRoleType.SUPERADMIN
+  startCampaignRequiresApproval: UserRoleType.SUPERADMIN,
+  maxSmsSegmentLength: UserRoleType.OWNER
 };
 
 const SETTINGS_NAMES: Partial<
@@ -86,7 +89,8 @@ const SETTINGS_DEFAULTS: IOrganizationSettings = {
   doNotAssignMessage:
     "Your ability to request texts has been put on hold. Please a contact a text team leader for more information.",
   defaultCampaignBuilderMode: CampaignBuilderMode.Advanced,
-  defaultAutosendingControlsMode: AutosendingControlsMode.Detailed
+  defaultAutosendingControlsMode: AutosendingControlsMode.Detailed,
+  maxSmsSegmentLength: 3
 };
 
 const SETTINGS_TRANSFORMERS: Partial<
@@ -133,13 +137,17 @@ export const getOrgFeature = <T extends keyof IOrganizationSettings>(
   const finalName = SETTINGS_NAMES[featureName] ?? featureName;
   try {
     const features = JSON.parse(rawFeatures);
-    const value = features[finalName] ?? defaultValue ?? null;
+
+    const foundValue = features[finalName];
+    const returnValue =
+      foundValue === undefined ? defaultValue ?? null : foundValue;
+
     const transformer = SETTINGS_TRANSFORMERS[featureName];
-    if (transformer && value) {
-      const result = transformer(value);
+    if (transformer && returnValue) {
+      const result = transformer(returnValue);
       return result as IOrganizationSettings[T];
     }
-    return value;
+    return returnValue;
   } catch (_err) {
     return SETTINGS_DEFAULTS[featureName] ?? null;
   }
@@ -183,7 +191,8 @@ export const resolvers = {
       "defaultCampaignBuilderMode",
       "showDoNotAssignMessage",
       "doNotAssignMessage",
-      "defaultAutosendingControlsMode"
+      "defaultAutosendingControlsMode",
+      "maxSmsSegmentLength"
     ])
   }
 };

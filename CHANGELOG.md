@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.1](https://github.com/politics-rewired/spoke/compare/v8.0.0...v8.0.1) (2024-02-15)
+
+
+### Bug Fixes
+
+* **mms:** get feature for max sms segment length ([#4](https://github.com/politics-rewired/spoke/issues/4)) ([f19b366](https://github.com/politics-rewired/spoke/commit/f19b366e2c83a742409756d6544644fed5dd274c))
+
+## [8.0.0](https://github.com/politics-rewired/spoke/compare/v7.3.0...v8.0.0) (2024-02-15)
+
+
+### Features
+
+* support sending mms without media ([#2](https://github.com/politics-rewired/spoke/issues/2)) ([3db7d25](https://github.com/politics-rewired/spoke/commit/3db7d25474601b087895be04aa2edc92d00bbb13))
+
 ## [7.3.0](https://github.com/politics-rewired/spoke/compare/v7.2.0...v7.3.0) (2023-12-10)
 
 

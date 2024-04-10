@@ -188,6 +188,7 @@ class GSScriptOptionsField extends GSFormField {
             scriptFields={scriptFields}
             campaignVariables={campaignVariables}
             integrationSourced={integrationSourced}
+            maxSmsSegmentLength={orgSettings.maxSmsSegmentLength}
             receiveFocus
             expandable
             onChange={(val) => this.setState({ scriptDraft: val.trim() })}

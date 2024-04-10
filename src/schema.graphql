@@ -482,6 +482,7 @@ input OrganizationSettingsInput {
   showDoNotAssignMessage: Boolean
   doNotAssignMessage: String
   defaultAutosendingControlsMode: AutosendingControlsMode
+  maxSmsSegmentLength: Int
 
   # Superadmin
   startCampaignRequiresApproval: Boolean
@@ -497,6 +498,7 @@ type OrganizationSettings {
   confirmationClickForScriptLinks: Boolean!
   showDoNotAssignMessage: Boolean!
   doNotAssignMessage: String!
+  maxSmsSegmentLength: Int
 
   # Supervolunteer
   startCampaignRequiresApproval: Boolean
