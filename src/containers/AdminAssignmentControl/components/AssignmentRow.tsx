@@ -8,16 +8,20 @@ import Toggle from "material-ui/Toggle";
 import React from "react";
 
 import { TextRequestType } from "../../../api/types";
-import type { TagWithTitle, TeamForAssignment } from "./types";
+import type {
+  TagWithTitle,
+  TeamForAssignment,
+  TeamInputWithTags
+} from "../types";
 
-interface Props {
+interface AssignmentRowProps {
   assignmentPool: TeamForAssignment;
   escalationTagList: TagWithTitle[];
   isRowDisabled: boolean;
-  onChange: (payload: any) => Promise<void> | void;
+  onChange: (payload: TeamInputWithTags) => Promise<void> | void;
 }
 
-const AssignmentRow: React.FC<Props> = (props) => {
+const AssignmentRow: React.FC<AssignmentRowProps> = (props) => {
   const {
     assignmentPool,
     isRowDisabled = false,
@@ -37,17 +41,18 @@ const AssignmentRow: React.FC<Props> = (props) => {
   ) => onChange({ assignmentType });
 
   const handleChangeMaxCount = (
-    _event: React.FormEvent<unknown>,
-    maxRequestCount: string
-  ) =>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const maxRequestCount = event?.target?.value;
     onChange({
       maxRequestCount: maxRequestCount ? parseInt(maxRequestCount, 10) : null
     });
+  };
 
   const handleChangeEscalationTags = (
     _event: React.ChangeEvent<any>,
-    value: Array<TagWithTitle> | null
-  ) => {
+    value: TagWithTitle[]
+  ): void => {
     onChange({ escalationTags: value });
   };
 
@@ -66,7 +71,13 @@ const AssignmentRow: React.FC<Props> = (props) => {
     isRowDisabled || !isAssignmentEnabled || id === "general";
 
   return (
-    <Grid container spacing={2} wrap="nowrap" alignItems="center">
+    <Grid
+      container
+      spacing={2}
+      wrap="nowrap"
+      alignItems="center"
+      justifyContent="space-between"
+    >
       <Grid item>
         <Chip label={title} style={{ color: textColor, backgroundColor }} />
       </Grid>
@@ -96,9 +107,9 @@ const AssignmentRow: React.FC<Props> = (props) => {
           />
         </SelectField>
       </Grid>
-      <Grid item>
+      <Grid item style={{ width: 200 }}>
         <TextField
-          floatingLabelText="Max to request at once"
+          label="Max to request at once"
           type="number"
           value={maxRequestCount}
           disabled={isRowDisabled || !isAssignmentEnabled}

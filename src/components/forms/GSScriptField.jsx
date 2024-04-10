@@ -116,6 +116,7 @@ class GSScriptField extends GSFormField {
             scriptFields={scriptFields}
             campaignVariables={campaignVariables}
             integrationSourced={integrationSourced}
+            maxSmsSegmentLength={orgSettings.maxSmsSegmentLength}
             expandable
             onChange={(val) => this.setState({ script: val })}
           />

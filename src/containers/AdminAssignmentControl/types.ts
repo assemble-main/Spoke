@@ -1,5 +1,4 @@
-import type { Tag } from "../../api/tag";
-import type { Team, TeamInput } from "../../api/team";
+import type { Tag, Team, TeamInput } from "@spoke/spoke-codegen";
 
 export type TagWithTitle = Pick<Tag, "id" | "title">;
 

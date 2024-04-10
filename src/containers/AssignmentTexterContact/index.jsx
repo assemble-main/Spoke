@@ -447,31 +447,35 @@ export class AssignmentTexterContact extends React.Component {
     this.setState({ dialogType: TexterDialogType.OptOut });
   };
 
-  handleApplyTags = (addedTags, removedTags, callback) => {
-    this.tagContact(addedTags, removedTags);
+  handleApplyTags = (addedContactTags, removedContactTags, callback) => {
+    this.tagContact(addedContactTags, removedContactTags);
 
     if (callback) {
       this.setState(
-        { addedTags, removedTags, isTagEditorOpen: false },
+        {
+          addedTags: addedContactTags,
+          removedTags: removedContactTags,
+          isTagEditorOpen: false
+        },
         callback
       );
     } else {
       this.setState({
-        addedTags,
-        removedTags,
+        addedTags: addedContactTags,
+        removedTags: removedContactTags,
         isTagEditorOpen: false
       });
     }
 
-    if (!callback && addedTags.length > 0) {
-      const mostImportantTag = sortBy(addedTags, "id")[0];
+    if (!callback && addedContactTags.length > 0) {
+      const mostImportantTag = sortBy(addedContactTags, "id")[0];
       const tagMessageText = mostImportantTag.tag.onApplyScript;
       if (tagMessageText !== "") this.handleChangeScript(tagMessageText);
     }
   };
 
-  handleApplyTagsAndMoveOn = (addedTags, removedTags) => {
-    this.handleApplyTags(addedTags, removedTags, async () => {
+  handleApplyTagsAndMoveOn = (addedContactTags, removedContactTags) => {
+    this.handleApplyTags(addedContactTags, removedContactTags, async () => {
       const { contact } = this.props;
       const payload = this.gatherSurveyChanges();
       await this.props.sendMessage(contact.id, payload);
@@ -479,11 +483,11 @@ export class AssignmentTexterContact extends React.Component {
   };
 
   // run mutation with added and removed tags
-  tagContact = (addedTags, removedTags) => {
+  tagContact = (addedContactTags, removedContactTags) => {
     const { contact } = this.props;
     const tag = {
-      addedTagIds: addedTags.map((t) => t.tag.id),
-      removedTagIds: removedTags.map((t) => t.tag.id)
+      addedTagIds: addedContactTags.map((t) => t.tag.id),
+      removedTagIds: removedContactTags.map((t) => t.tag.id)
     };
 
     this.props.addTagToContact(contact.id, tag);

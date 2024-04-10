@@ -1,4 +1,5 @@
 import { grey } from "@material-ui/core/colors";
+import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 import React from "react";
 
 const largeListStyle: React.CSSProperties = {
@@ -43,13 +44,17 @@ export interface LargeListItemProps {
   primaryText?: string;
   secondaryText?: React.ReactNode;
   rightActionMenu?: React.ReactNode;
+  draggable?: boolean;
 }
 
 export const LargeListItem: React.SFC<LargeListItemProps> = (props) => {
-  const { primaryText, secondaryText, rightActionMenu } = props;
+  const { primaryText, secondaryText, rightActionMenu, draggable } = props;
 
   return (
     <li style={largeListItemStyles.flexContainer}>
+      {draggable && (
+        <DragIndicatorIcon style={{ paddingRight: 10, cursor: "grab" }} />
+      )}
       <div style={largeListItemStyles.textWrapper}>
         {primaryText && (
           <p style={largeListItemStyles.primaryText}>{primaryText}</p>

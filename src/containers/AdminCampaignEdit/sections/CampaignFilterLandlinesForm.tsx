@@ -93,10 +93,9 @@ class FilterLandlinesForm extends React.Component<Props, State> {
             !landlinesFiltered && (
               <span>
                 <p>
-                  Filtering landlines or otherwise un-textable numbers will cost
-                  $.0025 (1/4 cent) per phone number, but as long as more than
-                  10-20% of your phone numbers are likely to be invalid, it will
-                  save you money.
+                  Filtering landlines or otherwise un-textable numbers takes a
+                  few minutes to run, but is a free service that can help you
+                  avoid paying for messages to numbers that won't receive them!
                 </p>
                 <p>
                   If you're pretty sure your phone numbers are valid, skip this

@@ -1885,6 +1885,20 @@ ALTER SEQUENCE public.campaign_contact_id_seq OWNED BY public.campaign_contact.i
 
 
 --
+-- Name: campaign_contact_upload; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.campaign_contact_upload (
+    campaign_id integer NOT NULL,
+    column_mapping json,
+    created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+
+ALTER TABLE public.campaign_contact_upload OWNER TO postgres;
+
+--
 -- Name: campaign_group; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -2070,7 +2084,8 @@ CREATE TABLE public.canned_response (
     title text NOT NULL,
     user_id integer,
     created_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+    updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    display_order integer DEFAULT 1 NOT NULL
 );
 
 
@@ -3275,7 +3290,7 @@ CREATE TABLE public."user" (
     is_superadmin boolean,
     terms boolean DEFAULT false,
     updated_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-    notification_frequency text DEFAULT 'ALL'::text NOT NULL,
+    notification_frequency text DEFAULT 'DAILY'::text NOT NULL,
     is_suspended boolean DEFAULT false NOT NULL,
     CONSTRAINT user_notification_frequency_check CHECK ((notification_frequency = ANY (ARRAY['ALL'::text, 'PERIODIC'::text, 'DAILY'::text, 'NONE'::text])))
 );
@@ -3768,6 +3783,22 @@ ALTER TABLE ONLY public.campaign_contact_tag
 
 
 --
+-- Name: campaign_contact_upload campaign_contact_upload_campaign_id_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.campaign_contact_upload
+    ADD CONSTRAINT campaign_contact_upload_campaign_id_unique UNIQUE (campaign_id);
+
+
+--
+-- Name: campaign_contact_upload campaign_contact_upload_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.campaign_contact_upload
+    ADD CONSTRAINT campaign_contact_upload_pkey PRIMARY KEY (campaign_id);
+
+
+--
 -- Name: campaign_group_campaign campaign_group_campaign_campaign_group_id_campaign_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -3829,6 +3860,14 @@ ALTER TABLE ONLY public.campaign_team
 
 ALTER TABLE ONLY public.campaign_variable
     ADD CONSTRAINT campaign_variable_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: canned_response canned_response_campaign_id_display_order_unique; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.canned_response
+    ADD CONSTRAINT canned_response_campaign_id_display_order_unique UNIQUE (campaign_id, display_order);
 
 
 --
@@ -4361,6 +4400,13 @@ CREATE INDEX campaign_contact_tag_tag_idx ON public.campaign_contact_tag USING b
 
 
 --
+-- Name: campaign_contact_upload_campaign_id_index; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX campaign_contact_upload_campaign_id_index ON public.campaign_contact_upload USING btree (campaign_id);
+
+
+--
 -- Name: campaign_creator_id_index; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -4879,6 +4925,13 @@ CREATE TRIGGER _500_campaign_contact_updated_at BEFORE UPDATE ON public.campaign
 
 
 --
+-- Name: campaign_contact_upload _500_campaign_contact_upload_updated_at; Type: TRIGGER; Schema: public; Owner: postgres
+--
+
+CREATE TRIGGER _500_campaign_contact_upload_updated_at BEFORE UPDATE ON public.campaign_contact_upload FOR EACH ROW EXECUTE FUNCTION public.universal_updated_at();
+
+
+--
 -- Name: all_campaign _500_campaign_external_system_id; Type: TRIGGER; Schema: public; Owner: postgres
 --
 
@@ -5231,6 +5284,14 @@ ALTER TABLE ONLY public.campaign_contact_tag
 
 ALTER TABLE ONLY public.campaign_contact_tag
     ADD CONSTRAINT campaign_contact_tag_tagger_id_foreign FOREIGN KEY (tagger_id) REFERENCES public."user"(id);
+
+
+--
+-- Name: campaign_contact_upload campaign_contact_upload_campaign_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.campaign_contact_upload
+    ADD CONSTRAINT campaign_contact_upload_campaign_id_foreign FOREIGN KEY (campaign_id) REFERENCES public.all_campaign(id);
 
 
 --

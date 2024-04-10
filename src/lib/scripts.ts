@@ -1,9 +1,12 @@
-import type { CampaignVariable } from "@spoke/spoke-codegen";
+import type {
+  CampaignContact,
+  CampaignVariable,
+  User
+} from "@spoke/spoke-codegen";
 import escapeRegExp from "lodash/escapeRegExp";
 import isNil from "lodash/isNil";
 
-import type { CampaignContact } from "../api/campaign-contact";
-import type { User } from "../api/user";
+import { getSpokeCharCount } from "./charset-utils";
 
 export const delimiters = {
   startDelimiter: "{",
@@ -37,7 +40,7 @@ const TITLE_CASE_FIELDS = [
   "texterLastName"
 ];
 
-const mediaExtractor = /\[\s*(http[^\]\s]*)\s*\]/;
+export const mediaExtractor = /\[\s*(http[^\]\s]*)\s*\]/;
 
 // Special first names that should not be capitalized
 const LOWERCASE_FIRST_NAMES = ["friend", "there"];
@@ -131,8 +134,17 @@ export const getAttachmentLink = (text: string) => {
   return null;
 };
 
-export const getMessageType = (text: string) => {
-  return mediaExtractor.test(text) ? "MMS" : "SMS";
+export const getMessageType = (
+  text: string,
+  maxSmsSegmentLength: number | null
+) => {
+  const { msgCount } = getSpokeCharCount(text);
+  if (
+    mediaExtractor.test(text) ||
+    (maxSmsSegmentLength && msgCount > maxSmsSegmentLength)
+  )
+    return "MMS";
+  return "SMS";
 };
 
 export enum ScriptTokenType {

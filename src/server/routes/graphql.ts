@@ -1,4 +1,5 @@
 /* eslint-disable import/prefer-default-export */
+import { ApolloArmor } from "@escape.tech/graphql-armor";
 import { addMocksToSchema } from "@graphql-tools/mock";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
@@ -49,6 +50,13 @@ export const createRouter = async () => {
     return err;
   };
 
+  const armor = new ApolloArmor({
+    maxDepth: {
+      n: 10
+    }
+  });
+  const protection = armor.protect();
+
   const plugins = config.isProduction
     ? []
     : [ApolloServerPluginLandingPageGraphQLPlayground()];
@@ -58,7 +66,8 @@ export const createRouter = async () => {
     formatError,
     debug: !config.isProduction,
     introspection: !config.isProduction,
-    plugins,
+    ...protection,
+    plugins: [...protection.plugins, ...plugins],
     context: async ({ req }) => contextForRequest(req)
   });
 

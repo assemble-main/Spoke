@@ -2,6 +2,7 @@ fragment CannedResponseInfo on CannedResponse {
   id
   title
   text
+  displayOrder
 }
 
 query GetCampaignCannedResponses($campaignId: String!) {

@@ -1,3 +1,4 @@
+import { UserRoleType } from "../../api/organization-membership";
 import { config } from "../../config";
 import logger from "../../logger";
 import { r } from "../models";
@@ -41,7 +42,7 @@ export const resolvers = {
     ]),
     settings: (organization) => organization,
     campaigns: async (organization, { cursor, campaignsFilter }, { user }) => {
-      await accessRequired(user, organization.id, "SUPERVOLUNTEER");
+      await accessRequired(user, organization.id, UserRoleType.SUPERVOLUNTEER);
       return getCampaigns(organization.id, cursor, campaignsFilter);
     },
     campaignsRelay: async (
@@ -49,12 +50,12 @@ export const resolvers = {
       { first, after, filter },
       { user }
     ) => {
-      await accessRequired(user, organization.id, "SUPERVOLUNTEER");
+      await accessRequired(user, organization.id, UserRoleType.SUPERVOLUNTEER);
       filter.organizationId = organization.id;
       return getCampaignsRelay({ first, after, filter });
     },
     templateCampaigns: async (organization, { first, after }, { user }) => {
-      await accessRequired(user, organization.id, "SUPERVOLUNTEER");
+      await accessRequired(user, organization.id, UserRoleType.SUPERVOLUNTEER);
       const query = r
         .reader("all_campaign")
         .where({
@@ -66,7 +67,7 @@ export const resolvers = {
       return formatPage(query, pagerOptions);
     },
     uuid: async (organization, _, { user }) => {
-      await accessRequired(user, organization.id, "SUPERVOLUNTEER");
+      await accessRequired(user, organization.id, UserRoleType.SUPERVOLUNTEER);
       const result = await r
         .reader("organization")
         .column("uuid")
@@ -74,7 +75,7 @@ export const resolvers = {
       return result[0].uuid;
     },
     optOuts: async (organization, _, { user }) => {
-      await accessRequired(user, organization.id, "ADMIN");
+      await accessRequired(user, organization.id, UserRoleType.ADMIN);
       return r.reader("opt_out").where({ organization_id: organization.id });
     },
     memberships: async (
@@ -83,7 +84,7 @@ export const resolvers = {
       { user },
       info
     ) => {
-      await accessRequired(user, organization.id, "SUPERVOLUNTEER");
+      await accessRequired(user, organization.id, UserRoleType.SUPERVOLUNTEER);
       const query = r
         .reader("user_organization")
         .where({ organization_id: organization.id });
@@ -173,7 +174,7 @@ export const resolvers = {
       return formatPage(query, pagerOptions);
     },
     people: async (organization, { role, campaignId, offset }, { user }) => {
-      await accessRequired(user, organization.id, "SUPERVOLUNTEER");
+      await accessRequired(user, organization.id, UserRoleType.SUPERVOLUNTEER);
       const query = buildUserOrganizationQuery(
         r.knex.select("user.*"),
         organization.id,
@@ -187,7 +188,7 @@ export const resolvers = {
       return query;
     },
     peopleCount: async (organization, _, { user }) => {
-      await accessRequired(user, organization.id, "SUPERVOLUNTEER");
+      await accessRequired(user, organization.id, UserRoleType.SUPERVOLUNTEER);
       return r.getCount(
         r
           .reader("user")
@@ -239,7 +240,7 @@ export const resolvers = {
       return !!assignmentTarget;
     },
     currentAssignmentTargets: async (organization, _, { user }) => {
-      await accessRequired(user, organization.id, "SUPERVOLUNTEER");
+      await accessRequired(user, organization.id, UserRoleType.SUPERVOLUNTEER);
       const cats = await allCurrentAssignmentTargets(organization.id);
       const formatted = cats.map((cat) => ({
         type: cat.assignment_type,
@@ -281,7 +282,7 @@ export const resolvers = {
       await accessRequired(
         context.user,
         organization.id,
-        "TEXTER",
+        UserRoleType.TEXTER,
         /* allowSuperadmin= */ true
       );
       try {
@@ -427,7 +428,7 @@ export const resolvers = {
         .orderBy("assignment_priority", "asc"),
     externalSystems: async (organization, { after, first }, { user }) => {
       const organizationId = parseInt(organization.id, 10);
-      await accessRequired(user, organizationId, "ADMIN");
+      await accessRequired(user, organizationId, UserRoleType.ADMIN);
 
       const query = r
         .reader("external_system")
@@ -441,7 +442,7 @@ export const resolvers = {
     ) => {
       const organizationId = parseInt(organization.id, 10);
       try {
-        await accessRequired(user, organizationId, "ADMIN", true);
+        await accessRequired(user, organizationId, UserRoleType.ADMIN, true);
       } catch {
         return null;
       }
@@ -461,7 +462,7 @@ export const resolvers = {
     },
     campaignGroups: async (organization, { after, first }, { user }) => {
       const organizationId = parseInt(organization.id, 10);
-      await accessRequired(user, organizationId, "ADMIN");
+      await accessRequired(user, organizationId, UserRoleType.ADMIN);
 
       const query = r
         .reader("campaign_group")

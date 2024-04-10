@@ -46,7 +46,11 @@ interface InnerProps extends OuterProps {
 }
 
 const AdminAssignmentControl: React.FC<InnerProps> = (props) => {
-  const { className = "", containerStyle = {}, style = {} } = props;
+  const {
+    className = "",
+    containerStyle = {},
+    style = { padding: "15px" }
+  } = props;
   const [changes, setChanges] = useState<Record<string, TeamInputWithTags>>({});
   const [working, setWorking] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);

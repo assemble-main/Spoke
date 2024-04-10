@@ -170,10 +170,18 @@ export interface CopyCampaignOptions {
   userId: number;
   quantity?: number;
   template?: boolean;
+  targetOrgId?: number | null;
 }
 
 export const copyCampaign = async (options: CopyCampaignOptions) => {
-  const { db, campaignId, userId, quantity = 1, template } = options;
+  const {
+    db,
+    campaignId,
+    userId,
+    quantity = 1,
+    template,
+    targetOrgId = null
+  } = options;
 
   const result = await db.primary.transaction(async (trx) => {
     const cloneSingle = async (count: number) => {
@@ -203,7 +211,7 @@ export const copyCampaign = async (options: CopyCampaignOptions) => {
             external_system_id
           )
           select
-            organization_id,
+            coalesce(?, organization_id),
             (case
               when is_template then replace(concat('COPY - ', title), '#', ?::text)
               else 'COPY - ' || title
@@ -228,7 +236,7 @@ export const copyCampaign = async (options: CopyCampaignOptions) => {
           where id = ?
           returning *
         `,
-        [count, userId, campaignId]
+        [targetOrgId, count, userId, campaignId]
       );
 
       if (template) {
@@ -293,11 +301,12 @@ export const copyCampaign = async (options: CopyCampaignOptions) => {
       // Copy canned responses
       await trx.raw(
         `
-          insert into canned_response (campaign_id, title, text)
+          insert into canned_response (campaign_id, title, text, display_order)
           select
             ? as campaign_id,
             title,
-            text
+            text,
+            display_order
           from canned_response
           where campaign_id = ?
         `,
@@ -307,14 +316,20 @@ export const copyCampaign = async (options: CopyCampaignOptions) => {
       // Copy Teams
       await trx.raw(
         `
+          with target_org as (select ?::int as id)
           insert into campaign_team (campaign_id, team_id)
           select
             ? as campaign_id,
             team_id
-          from campaign_team
-          where campaign_id = ?
+          from campaign_team ct
+          join team t on ct.team_id = t.id
+          where campaign_id = ? 
+          and exists (-- don't copy teams from another organization
+            select 1 from target_org where target_org.id is null 
+            or target_org.id = t.organization_id
+          )
         `,
-        [newCampaign.id, campaignId]
+        [targetOrgId, newCampaign.id, campaignId]
       );
 
       if (!template) {
@@ -420,7 +435,8 @@ export const editCampaign = async (
     repliesStaleAfter,
     timezone,
     externalSystemId,
-    messagingServiceSid
+    messagingServiceSid,
+    columnMapping
   } = campaign;
 
   const organizationId = origCampaignRecord.organization_id;
@@ -471,9 +487,26 @@ export const editCampaign = async (
     Object.prototype.hasOwnProperty.call(campaign, "contactsFile") &&
     campaign.contactsFile
   ) {
-    const processedContacts = await processContactsFile(campaign.contactsFile);
+    const processedContacts = await processContactsFile({
+      file: campaign.contactsFile,
+      columnMapping
+    });
     campaign.contacts = processedContacts.contacts;
     validationStats = processedContacts.validationStats;
+
+    await r.knex.raw(
+      `
+        ? ON CONFLICT (campaign_id)
+        DO UPDATE SET column_mapping = EXCLUDED.column_mapping, updated_at = CURRENT_TIMESTAMP 
+        RETURNING *;
+      `,
+      [
+        r.knex("campaign_contact_upload").insert({
+          campaign_id: id,
+          column_mapping: JSON.stringify(columnMapping)
+        })
+      ]
+    );
   }
 
   if (
@@ -724,8 +757,13 @@ export const editCampaign = async (
 
     // Ignore the mocked `id` automatically created on the input by GraphQL
     const convertedResponses = campaign.cannedResponses.map(
-      ({ id: _cannedResponseId, ...response }: { id: number } | any) => ({
+      ({
+        id: _cannedResponseId,
+        displayOrder,
+        ...response
+      }: { id: number } | any) => ({
         ...response,
+        display_order: displayOrder,
         campaign_id: id
       })
     );

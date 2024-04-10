@@ -1,6 +1,6 @@
-import type { Notice } from "../../../api/notice";
+import type { Notice } from "@spoke/spoke-codegen";
 
 export type OrgLevelNotificationGetter = (
   userId: string,
-  organizationId?: string
+  organizationId: string
 ) => Promise<Notice[]> | Notice[];

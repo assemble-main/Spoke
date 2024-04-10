@@ -5,6 +5,11 @@ import Divider from "@material-ui/core/Divider";
 import Grid from "@material-ui/core/Grid";
 import Snackbar from "@material-ui/core/Snackbar";
 import Alert from "@material-ui/lab/Alert";
+import {
+  GetCampaignDocument,
+  GetOrganizationDataDocument,
+  GetOrganizationsDocument
+} from "@spoke/spoke-codegen";
 import { css, StyleSheet } from "aphrodite";
 import PropTypes from "prop-types";
 import React from "react";
@@ -21,12 +26,12 @@ import { withAuthzContext } from "../AuthzProvider";
 import { loadData } from "../hoc/with-operations";
 import CampaignExportModal from "./components/CampaignExportModal";
 import CampaignSurveyStats from "./components/CampaignSurveyStats";
+import CopyCampaignModal from "./components/CopyCampaignModal";
 import DeliverabilityStats from "./components/DeliverabilityStats";
 import TexterStats from "./components/TexterStats";
 import TopLineStats from "./components/TopLineStats";
 import VanExportModal from "./components/VanExportModal";
 import VanSyncModal from "./components/VanSyncModal";
-import { GET_CAMPAIGN, GET_ORGANIZATION_DATA } from "./queries";
 
 const styles = StyleSheet.create({
   container: {
@@ -78,6 +83,7 @@ class AdminCampaignStats extends React.Component {
     exportDialogOpen: false,
     exportVanOpen: false,
     syncVanOpen: false,
+    copyCampaignModalOpen: false,
     disableExportButton: false,
     disableVanExportButton: false,
     disableVanSyncButton: false,
@@ -146,6 +152,52 @@ class AdminCampaignStats extends React.Component {
       disableVanSyncButton: true
     });
 
+  openCopyCampaignModal = () => this.setState({ copyCampaignModalOpen: true });
+
+  handleDismissCopyCampaign = () =>
+    this.setState({ copyCampaignModalOpen: false });
+
+  handleCompleteCopyCampaign = (copiedCampaignId) => {
+    this.setState({ copyCampaignModalOpen: false });
+    if (copiedCampaignId === undefined)
+      this.setState({
+        campaignJustCopied: true,
+        copyingCampaign: false,
+        copyCampaignError: "There was an error copying this campaign."
+      });
+    else
+      this.setState({
+        campaignJustCopied: true,
+        copyingCampaign: false,
+        copiedCampaignId
+      });
+  };
+
+  handleCopyCampaignSameOrg = () => {
+    this.setState({ copyingCampaign: true });
+
+    this.props.mutations
+      .copyCampaign()
+      .then((result) => {
+        if (result.errors) {
+          throw result.errors;
+        }
+
+        this.setState({
+          campaignJustCopied: true,
+          copyingCampaign: false,
+          copiedCampaignId: result.data.copyCampaign.id
+        });
+      })
+      .catch((error) =>
+        this.setState({
+          campaignJustCopied: true,
+          copyingCampaign: false,
+          copyCampaignError: error
+        })
+      );
+  };
+
   prevCampaignClicked = (campaignId) => {
     const { history } = this.props;
     const { organizationId } = this.props.match.params;
@@ -164,14 +216,15 @@ class AdminCampaignStats extends React.Component {
       disableVanExportButton,
       disableVanSyncButton
     } = this.state;
-    const { data, match, isAdmin } = this.props;
+    const { data, match, isAdmin, isSuperadmin, organizationData } = this.props;
     const { organizationId, campaignId } = match.params;
     const { campaign } = data;
-    const { pendingJobs } = campaign;
+    const { organization } = organizationData;
 
     if (!campaign) {
       return <h1> Uh oh! Campaign {campaignId} doesn't seem to exist </h1>;
     }
+    const { pendingJobs, messagingService } = campaign;
 
     const currentExportJob = pendingJobs.find(
       (job) => job.jobType === "export"
@@ -201,7 +254,21 @@ class AdminCampaignStats extends React.Component {
       ? DateTime.fromISO(campaign.dueBy).toFormat("DD")
       : "No Due Date";
     const isOverdue = DateTime.local() >= DateTime.fromISO(campaign.dueBy);
-    const newTitle = `${this.props.organizationData.organization.name} - Campaigns - ${campaignId}: ${campaign.title}`;
+    const newTitle = `${organization.name} - Campaigns - ${campaignId}: ${campaign.title}`;
+
+    // only a superadmin with multiple active orgs can copy a campaign to another org
+    const orgLength = this.props.orgs?.organizations?.length;
+    const onlyCopyCampaignSameOrg =
+      !isSuperadmin || orgLength === undefined || orgLength < 2;
+
+    let msgServiceName = messagingService?.name;
+    if (!msgServiceName) {
+      msgServiceName = messagingService?.id;
+    }
+    const showMessagingServiceName =
+      organization.messagingServices.pageInfo.totalCount > 1 &&
+      campaign.isStarted &&
+      msgServiceName;
 
     return (
       <div>
@@ -236,6 +303,12 @@ class AdminCampaignStats extends React.Component {
             <span style={{ color: isOverdue ? red[600] : undefined }}>
               {dueFormatted} {isOverdue && "(Overdue)"}
             </span>
+            {showMessagingServiceName && (
+              <>
+                <br />
+                Messaging Service: {msgServiceName}
+              </>
+            )}
           </div>
           <div className={css(styles.flexColumn)}>
             <div className={css(styles.rightAlign)}>
@@ -312,30 +385,11 @@ class AdminCampaignStats extends React.Component {
                           {...dataTest("copyCampaign")}
                           variant="contained"
                           disabled={this.state.copyingCampaign}
-                          onClick={() => {
-                            this.setState({ copyingCampaign: true });
-
-                            this.props.mutations
-                              .copyCampaign()
-                              .then((result) => {
-                                if (result.errors) {
-                                  throw result.errors;
-                                }
-
-                                this.setState({
-                                  campaignJustCopied: true,
-                                  copyingCampaign: false,
-                                  copiedCampaignId: result.data.copyCampaign.id
-                                });
-                              })
-                              .catch((error) =>
-                                this.setState({
-                                  campaignJustCopied: true,
-                                  copyingCampaign: false,
-                                  copyCampaignError: error
-                                })
-                              );
-                          }}
+                          onClick={
+                            onlyCopyCampaignSameOrg
+                              ? this.handleCopyCampaignSameOrg
+                              : this.openCopyCampaignModal
+                          }
                         >
                           Copy Campaign
                         </Button>
@@ -415,6 +469,13 @@ class AdminCampaignStats extends React.Component {
           onRequestClose={this.handleDismissVanSync}
           onComplete={this.handleCompleteVanSync}
         />
+        <CopyCampaignModal
+          currentOrgId={organizationId}
+          campaignId={campaignId}
+          open={this.state.copyCampaignModalOpen}
+          onRequestClose={this.handleDismissCopyCampaign}
+          onComplete={this.handleCompleteCopyCampaign}
+        />
       </div>
     );
   }
@@ -430,7 +491,7 @@ AdminCampaignStats.propTypes = {
 
 const queries = {
   data: {
-    query: GET_CAMPAIGN,
+    query: GetCampaignDocument,
     options: (ownProps) => ({
       variables: {
         campaignId: ownProps.match.params.campaignId
@@ -439,12 +500,16 @@ const queries = {
   },
 
   organizationData: {
-    query: GET_ORGANIZATION_DATA,
+    query: GetOrganizationDataDocument,
     options: (ownProps) => ({
       variables: {
         organizationId: ownProps.match.params.organizationId
       }
     })
+  },
+
+  orgs: {
+    query: GetOrganizationsDocument
   }
 };
 

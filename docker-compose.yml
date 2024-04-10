@@ -1,7 +1,7 @@
 version: '3'
 services:
   postgres:
-    image: postgres
+    image: postgres:15
     restart: always
     environment:
       POSTGRES_DB: spokedev
@@ -9,11 +9,8 @@ services:
       POSTGRES_USER: spoke
     volumes:
       - postgres:/var/lib/postgresql/data
-  redis:
-    image: redis
-    restart: always
-    volumes:
-      - redis:/data
+    ports:
+      - 15432:5432
   app:
     build:
       context: .
@@ -21,12 +18,10 @@ services:
         SPOKE_VERSION: 1.4.1
     depends_on:
       - postgres
-      - redis
     env_file:
       - ./.env
     environment:
       DATABASE_URL: postgres://spoke:spoke@postgres:5432/spokedev
-      REDIS_URL: redis://redis:6379
     image: spoke
     ports:
       - 3000:3000
@@ -34,6 +29,4 @@ services:
       - ./.env:/Spoke/.env
 volumes:
   postgres:
-    external: false
-  redis:
     external: false

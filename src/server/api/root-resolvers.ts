@@ -254,7 +254,7 @@ const rootResolvers = {
 
       const countQuery = query.clone();
       const [{ count: totalCount }] = await countQuery.count();
-      const alarms = await query
+      const alarmRows = await query
         .join("message", "message.id", "=", "troll_alarm.message_id")
         .join("user", "user.id", "message.user_id")
         .join(
@@ -278,32 +278,32 @@ const rootResolvers = {
         )
         .orderBy("troll_alarm.message_id", "desc")
         .limit(limit)
-        .offset(offset)
-        .map(
-          ({
-            message_id,
-            token: alarmToken,
-            dismissed: alarmDismissed,
-            message_text,
-            cc_id,
+        .offset(offset);
+      const alarms = alarmRows.map(
+        ({
+          message_id,
+          token: alarmToken,
+          dismissed: alarmDismissed,
+          message_text,
+          cc_id,
+          campaign_id,
+          cc_first_name,
+          cc_last_name,
+          ...alarmUser
+        }) => ({
+          message_id,
+          token: alarmToken,
+          dismissed: alarmDismissed,
+          message_text,
+          user: alarmUser,
+          contact: {
+            id: cc_id,
             campaign_id,
-            cc_first_name,
-            cc_last_name,
-            ...alarmUser
-          }) => ({
-            message_id,
-            token: alarmToken,
-            dismissed: alarmDismissed,
-            message_text,
-            user: alarmUser,
-            contact: {
-              id: cc_id,
-              campaign_id,
-              first_name: cc_first_name,
-              last_name: cc_last_name
-            }
-          })
-        );
+            first_name: cc_first_name,
+            last_name: cc_last_name
+          }
+        })
+      );
 
       return { alarms, totalCount };
     },

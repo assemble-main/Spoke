@@ -7,7 +7,10 @@ export const processNumbers = async (csvFile: Upload, numbersList: string) => {
   let numbers;
 
   if (csvFile) {
-    const { contacts } = await processContactsFile(csvFile, true);
+    const { contacts } = await processContactsFile({
+      file: csvFile,
+      onlyCell: true
+    });
 
     numbers = contacts.map((contact) => {
       return getFormattedPhoneNumber(contact.cell);

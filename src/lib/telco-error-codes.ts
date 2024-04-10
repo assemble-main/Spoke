@@ -28,9 +28,11 @@ export const errorCodeDescriptions: Record<string, string> = {
   "4720": "Unreachable phone number",
   "4730": "Unreachable phone number (recipient maybe roaming)",
   "4740": "Unreachable sending phone number", // this one shouldn't happen, but has happened
-  "4750": "Carrier rejected (maybe spam)",
-  "4770": "Blocked as spam",
+  "4750": "Unknown AT&T Error (block can be contested)",
+  "4770": "Blocked as spam (block can be contested)",
   "4780": "Carrier rejected (sending rates exceeded)",
+  "4781": "Unknown AT&T Error (block can be contested)",
+  "4785": "Carrier rejected (sending rates exceeded)",
   "5106": "Unroutable (can be retried)",
   "5620": "Carrier outage",
   "9902": "Delivery receipt expired",

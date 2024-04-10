@@ -148,11 +148,6 @@ export const getContactResultMessage = (validationStats: ValidationStats) => {
   return resultMessages;
 };
 
-export const fieldAliases: Record<string, string[]> = {
-  firstName: ["first_name", "firstname"],
-  lastName: ["last_name", "lastname"]
-};
-
 export const onlyCellFields = ["cell"];
 
 export const requiredUploadFields = ["firstName", "lastName", "cell"];
@@ -165,10 +160,6 @@ export const topLevelUploadFields = [
   "external_id"
 ];
 
-const notCustomFields = topLevelUploadFields
-  .map((field) => fieldAliases[field] || [field])
-  .reduce((acc, fieldWithAliases) => acc.concat(fieldWithAliases), []);
-
 export interface ValidateCsvOptions {
   data: any[];
   meta: { fields: string[] };
@@ -179,23 +170,12 @@ export const validateCsv = ({ data, meta, onlyCell }: ValidateCsvOptions) => {
   const { fields } = meta;
 
   const missingFields = [];
-  const useAliases: Record<string, string> = {};
 
   const requiredFields = onlyCell ? onlyCellFields : requiredUploadFields;
 
   for (const field of requiredFields) {
     if (!fields.includes(field)) {
-      let fieldFoundViaAlias = false;
-      for (const alias of fieldAliases[field] || []) {
-        if (fields.includes(alias)) {
-          useAliases[field] = alias;
-          fieldFoundViaAlias = true;
-        }
-      }
-
-      if (!fieldFoundViaAlias) {
-        missingFields.push(field);
-      }
+      missingFields.push(field);
     }
   }
 
@@ -203,19 +183,10 @@ export const validateCsv = ({ data, meta, onlyCell }: ValidateCsvOptions) => {
     const errorMessage = `Missing fields: ${missingFields.join(", ")}`;
     throw new Error(errorMessage);
   } else {
-    if (Object.keys(useAliases).length > 0) {
-      for (const row of data) {
-        for (const field of Object.keys(useAliases)) {
-          row[field] = row[useAliases[field]];
-          delete row[useAliases[field]];
-        }
-      }
-    }
-
     const { validationStats, validatedData } = getValidatedData(data, []);
 
     const customFields = fields.filter(
-      (field) => !notCustomFields.includes(field)
+      (field) => !topLevelUploadFields.includes(field)
     );
 
     return {

@@ -1,3 +1,4 @@
+import type { MutationResult } from "@apollo/client/react/types/types";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -6,17 +7,26 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
-import type { TemplateCampaignFragment } from "@spoke/spoke-codegen";
+import type {
+  CreateCampaignFromTemplateMutation,
+  TemplateCampaignFragment
+} from "@spoke/spoke-codegen";
 import {
   GetAdminCampaignsDocument,
   useCreateCampaignFromTemplateMutation,
   useGetTemplateCampaignsQuery
 } from "@spoke/spoke-codegen";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 export interface CreateCampaignFromTemplateDialogProps {
   organizationId: string;
   open: boolean;
+  onCreateTemplateCompleted: (
+    copiedCampaigns: NonNullable<
+      MutationResult<CreateCampaignFromTemplateMutation>["data"]
+    >["copyCampaigns"],
+    selectedTemplateTitle: string
+  ) => void;
   onClose?: () => Promise<void> | void;
   defaultTemplate?: TemplateCampaignFragment;
 }
@@ -24,12 +34,17 @@ export interface CreateCampaignFromTemplateDialogProps {
 export const CreateCampaignFromTemplateDialog: React.FC<CreateCampaignFromTemplateDialogProps> = (
   props
 ) => {
+  const defaultTemplate = props.defaultTemplate ?? null;
+  const defaultCopyCount = 1;
   const [
     selectedTemplate,
     setSelectedTemplate
-  ] = useState<TemplateCampaignFragment | null>(props.defaultTemplate ?? null);
-  const [quantity, setQuantity] = useState<number | null>(1);
-  const { data, error } = useGetTemplateCampaignsQuery({
+  ] = useState<TemplateCampaignFragment | null>(defaultTemplate);
+  const [quantity, setQuantity] = useState<number | null>(defaultCopyCount);
+  const {
+    data: templateCampaignsData,
+    error: templateCampaignsError
+  } = useGetTemplateCampaignsQuery({
     variables: { organizationId: props.organizationId }
   });
   const [
@@ -39,8 +54,18 @@ export const CreateCampaignFromTemplateDialog: React.FC<CreateCampaignFromTempla
     refetchQueries: [GetAdminCampaignsDocument]
   });
 
+  // Reset state when dialog is closed
+  useEffect(() => {
+    if (!props.open) {
+      setSelectedTemplate(defaultTemplate);
+      setQuantity(defaultCopyCount);
+    }
+  }, [props.open]);
+
   const templates =
-    data?.organization?.templateCampaigns?.edges?.map(({ node }) => node) ?? [];
+    templateCampaignsData?.organization?.templateCampaigns?.edges?.map(
+      ({ node }) => node
+    ) ?? [];
 
   const handleChangeTemplate = useCallback(
     (
@@ -77,17 +102,33 @@ export const CreateCampaignFromTemplateDialog: React.FC<CreateCampaignFromTempla
   const handleClickCreate = useCallback(async () => {
     if (!(quantity !== null && selectedTemplate !== null && !working)) return;
 
-    await createFromTemplate({
+    const result = await createFromTemplate({
       variables: { templateId: selectedTemplate.id, quantity }
     });
+    const { data, errors } = result;
+    const copiedCampaigns = data?.copyCampaigns ?? [];
+    const hasCopiedCampaigns = copiedCampaigns.length > 0;
+    const noErrors = !errors || errors.length === 0;
+    if (hasCopiedCampaigns && noErrors) {
+      const selectedTemplateTitle = selectedTemplate?.title ?? "";
+      props.onCreateTemplateCompleted(copiedCampaigns, selectedTemplateTitle);
+    }
+
     props.onClose?.();
-  }, [quantity, selectedTemplate, createFromTemplate, props.onClose]);
+  }, [
+    quantity,
+    selectedTemplate,
+    createFromTemplate,
+    props.onClose,
+    props.onCreateTemplateCompleted
+  ]);
 
   return (
     <Dialog
       onClose={props.onClose}
       aria-labelledby="create-from-template-dialog-title"
       open={props.open}
+      disableRestoreFocus
     >
       <DialogTitle id="create-from-template-dialog-title">
         Create Campaign from Template
@@ -96,9 +137,9 @@ export const CreateCampaignFromTemplateDialog: React.FC<CreateCampaignFromTempla
         <DialogContentText>
           Select a campaign template to create from
         </DialogContentText>
-        {error && (
+        {templateCampaignsError && (
           <DialogContentText>
-            Error fetching templates: {error.message}
+            Error fetching templates: {templateCampaignsError.message}
           </DialogContentText>
         )}
         <Autocomplete

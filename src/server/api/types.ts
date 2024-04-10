@@ -122,6 +122,7 @@ export interface CampaignRecord {
   autosend_status: AutosendStatus;
   autosend_user_id: number;
   messaging_service_sid: string | null;
+  column_mapping: string | null;
 }
 
 export interface AssignmentRecord {

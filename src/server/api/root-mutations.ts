@@ -933,7 +933,7 @@ const rootMutations = {
 
     copyCampaigns: async (
       _root,
-      { sourceCampaignId, quantity },
+      { sourceCampaignId, quantity, targetOrgId = null },
       { user, loaders, db }
     ) => {
       const campaignId = parseInt(sourceCampaignId, 10);
@@ -944,7 +944,8 @@ const rootMutations = {
         db,
         campaignId,
         userId: parseInt(user.id, 10),
-        quantity
+        quantity,
+        targetOrgId
       });
 
       const memoizer = await MemoizeHelper.getMemoizer();
@@ -1309,7 +1310,7 @@ const rootMutations = {
           );
         } else if (config.DEFAULT_SERVICE === "fakeservice") {
           await trx("messaging_service").insert({
-            messaging_service_sid: "fakeservice",
+            messaging_service_sid: `fakeservice${newOrganization.id}`,
             organization_id: newOrganization.id,
             service_type: "assemble-numbers"
           });
@@ -1996,7 +1997,7 @@ const rootMutations = {
       const campaign = await r
         .knex("campaign")
         .where({ id })
-        .first(["organization_id", "is_archived", "autosend_status"]);
+        .first(["id", "organization_id", "is_archived", "autosend_status"]);
 
       const organizationId = campaign.organization_id;
 
@@ -2907,18 +2908,22 @@ const rootMutations = {
 
             // Update team_escalation_tags
             if (team.escalationTagIds) {
-              await trx("team_escalation_tags")
-                .where({ team_id: teamToReturn.id })
-                .del();
-
               teamToReturn.escalationTags = await trx("team_escalation_tags")
-                .insert(
-                  team.escalationTagIds.map((tagId) => ({
-                    team_id: teamToReturn.id,
-                    tag_id: tagId
-                  }))
-                )
+                .where({ team_id: teamToReturn.id })
+                .del()
                 .returning("*");
+
+              // knex disallows empty array inserts
+              if (team.escalationTagIds.length !== 0) {
+                teamToReturn.escalationTags = await trx("team_escalation_tags")
+                  .insert(
+                    team.escalationTagIds.map((tagId) => ({
+                      team_id: teamToReturn.id,
+                      tag_id: tagId
+                    }))
+                  )
+                  .returning("*");
+              }
             }
 
             return teamToReturn;
@@ -3497,9 +3502,10 @@ const rootMutations = {
                 const switchboard = config.SWITCHBOARD_BASE_URL ?? "[default]";
 
                 const text = [
-                  "This is an automated org shutdown request triggered through the superadmin.",
+                  "This is an automated org shutdown request triggered by a superadmin.",
                   `Organization id: ${organizationId}, name: ${org.name}, from instance hosted at ${config.BASE_URL}.`,
-                  `Switchboard ${switchboard}, profiles:\n${messagingServiceSids}`
+                  `Switchboard ${switchboard}, profiles:\n${messagingServiceSids}`,
+                  "Note: This is NOT necessarily an instance shutdown request."
                 ].join("\n\n");
 
                 await sendEmail({

@@ -15,6 +15,7 @@ interface Window {
   NODE_ENV: string;
   BASE_URL: string;
   ENABLE_TROLLBOT: boolean;
+  SHOW_10DLC_REGISTRATION_NOTICES: boolean;
 
   AuthService: any;
 }

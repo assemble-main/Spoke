@@ -1,8 +1,11 @@
+import { renderToMjml } from "@faire/mjml-react/utils/renderToMjml";
+import mjml2html from "mjml";
 import React from "react";
-import ReactDOMServer from "react-dom/server";
 
+import assemblePalette from "../../../styles/assemble-palette";
 import type { CampaignRecord, OrganizationRecord } from "../../api/types";
 import { NotificationTypes } from "../../api/types";
+import TemplateWrapper from "./template-wrapper";
 
 interface NotificationProps {
   campaign: CampaignRecord;
@@ -12,6 +15,24 @@ interface NotificationProps {
   textingUrl: string;
 }
 
+const styles = {
+  font: {
+    fontFamily: "Helvetica"
+  },
+  button: {
+    width: 80,
+    backgroundColor: assemblePalette.primary.navy,
+    padding: `12px 20px`,
+    borderRadius: 4,
+    cursor: "pointer",
+    marginBottom: 10
+  },
+  buttonText: {
+    color: "white",
+    textDecoration: "none"
+  }
+};
+
 const AssignmentCreated: React.FC<NotificationProps> = ({
   organization,
   campaign,
@@ -19,22 +40,21 @@ const AssignmentCreated: React.FC<NotificationProps> = ({
   textingUrl,
   settingsUrl
 }) => {
+  const orgName = organization.name;
   return (
-    <div>
-      <p>You just got a new texting assignment from {organization.name}</p>
+    <TemplateWrapper organizationName={orgName} settingsUrl={settingsUrl}>
+      <p>Hello!</p>
       <p>
-        [{campaign.title}]: {assignmentCount} first messages to send
+        You just got a new texting assignment from {orgName}: {campaign.title}.
       </p>
+      <p>There are {assignmentCount} first message(s) to send.</p>
+      <div style={styles.button}>
+        <a style={styles.buttonText} href={textingUrl}>
+          Send Now
+        </a>
+      </div>
       <br />
-      <p>
-        You can start sending texts right away here:{" "}
-        <a href={textingUrl}>{textingUrl}</a>
-      </p>
-      <br />
-      <p>
-        To modify your notification settings, go <a href={settingsUrl}>here</a>
-      </p>
-    </div>
+    </TemplateWrapper>
   );
 };
 
@@ -45,22 +65,26 @@ const AssignmentUpdated: React.FC<NotificationProps> = ({
   textingUrl,
   settingsUrl
 }) => {
+  const orgName = organization.name;
   return (
-    <div>
-      <p>Your texting assignment from {organization.name} has been updated.</p>
+    <TemplateWrapper organizationName={orgName} settingsUrl={settingsUrl}>
+      <p>Hello!</p>
       <p>
-        [{campaign.title}]: {assignmentCount} first messages to send.{" "}
+        Your texting assignment from {orgName}: {campaign.title} has been
+        updated.
       </p>
+      <p>
+        {assignmentCount === "1"
+          ? `There is one message to send. `
+          : `There are ${assignmentCount} messages to send. `}
+      </p>
+      <div style={styles.button}>
+        <a style={styles.buttonText} href={textingUrl}>
+          Send Now
+        </a>
+      </div>
       <br />
-      <p>
-        You can start sending texts right away here:{" "}
-        <a href={textingUrl}>{textingUrl}</a>
-      </p>
-      <br />
-      <p>
-        To modify your notification settings, go <a href={settingsUrl}>here</a>
-      </p>
-    </div>
+    </TemplateWrapper>
   );
 };
 
@@ -70,22 +94,21 @@ const AssignmentMessageReceived: React.FC<NotificationProps> = ({
   textingUrl,
   settingsUrl
 }) => {
+  const orgName = organization.name;
   return (
-    <div>
+    <TemplateWrapper organizationName={orgName} settingsUrl={settingsUrl}>
+      <p>Hello!</p>
       <p>
-        Someone responded to your message from ${organization.name} in $
-        {campaign.title}
+        Someone responded to your message from {orgName} in {campaign.title}.
+        Check out your pending texts!
       </p>
+      <div style={styles.button}>
+        <a style={styles.buttonText} href={textingUrl}>
+          Send Now
+        </a>
+      </div>
       <br />
-      <p>
-        You can look at your pending texts here:{" "}
-        <a href={textingUrl}>{textingUrl}</a>
-      </p>
-      <br />
-      <p>
-        To modify your notification settings, go <a href={settingsUrl}>here</a>
-      </p>
-    </div>
+    </TemplateWrapper>
   );
 };
 
@@ -114,7 +137,7 @@ const getNotificationContent = (
       throw new Error(`Unrecognized notification type ${notificationType}`);
   }
 
-  const content = ReactDOMServer.renderToStaticMarkup(template);
+  const content = mjml2html(renderToMjml(template)).html;
 
   return {
     content,

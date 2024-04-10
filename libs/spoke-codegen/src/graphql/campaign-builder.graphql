@@ -43,7 +43,19 @@ query GetCampaignScriptPreview($campaignId: String!) {
   }
 }
 
-mutation EditCampaignMessagingService($campaignId: String!, $payload: CampaignInput!) {
+query GetCampaignInteractionSteps($campaignId: String!) {
+  campaign(id: $campaignId) {
+    id
+    interactionSteps {
+      id
+    }
+  }
+}
+
+mutation EditCampaignMessagingService(
+  $campaignId: String!
+  $payload: CampaignInput!
+) {
   editCampaign(id: $campaignId, campaign: $payload) {
     id
     messagingServiceSid

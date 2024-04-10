@@ -1,11 +1,16 @@
+import type { Knex } from "knex";
+import type { PoolClient } from "pg";
+
 import { config } from "../../../config";
 import { getFormattedPhoneNumber } from "../../../lib/phone-format";
+import { getMessageType } from "../../../lib/scripts";
 import { stringIsAValidUrl } from "../../../lib/utils";
 import logger from "../../../logger";
 import { makeNumbersClient } from "../../lib/assemble-numbers";
 import { r } from "../../models";
 import statsd from "../../statsd";
 import { errToObj } from "../../utils";
+import { getOrgFeature } from "../organization-settings";
 import type { MessagingServiceRecord, RequestHandlerFactory } from "../types";
 import { MessagingServiceType } from "../types";
 import { symmetricDecrypt } from "./crypto";
@@ -174,8 +179,23 @@ export const sendMessage = async (
     .reader("campaign_contact")
     .where({ id: campaignContactId })
     .first("zip");
+
+  const { features } = await r
+    .reader("organization")
+    .where({ id: organizationId })
+    .first("features")
+    .catch(() => ({}));
+
+  const maxSmsSegmentLength = getOrgFeature("maxSmsSegmentLength", features);
   const { body, mediaUrl } = messageComponents(messageText);
-  const mediaUrls = mediaUrl ? [mediaUrl] : undefined;
+
+  const mediaUrls = mediaUrl
+    ? [mediaUrl]
+    : // check if we should convert to switchboard format for empty mms
+    getMessageType(body, maxSmsSegmentLength) === "MMS"
+    ? []
+    : undefined;
+
   const messageInput: NumbersOutboundMessagePayload = {
     profileId,
     to,

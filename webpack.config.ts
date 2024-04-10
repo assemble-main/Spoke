@@ -99,6 +99,13 @@ const webpackConfig: WebpackConfiguration = {
           ].filter(Boolean)
         }
       },
+      // https://github.com/webpack/webpack/issues/11467#issuecomment-691873586
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false
+        }
+      },
       {
         test: /\.css$/,
         use: [{ loader: "style-loader" }, { loader: "css-loader" }]

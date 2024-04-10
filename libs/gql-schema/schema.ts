@@ -285,7 +285,7 @@ const rootSchema = `
     bulkUpdateScript(organizationId:String!, findAndReplace: BulkUpdateScriptInput!): [ScriptUpdateResult]
     deleteJob(campaignId:String!, id:String!): JobRequest
     copyCampaign(id: String!): Campaign
-    copyCampaigns(sourceCampaignId: String!, quantity: Int!): [Campaign!]!
+    copyCampaigns(sourceCampaignId: String!, quantity: Int!, targetOrgId: String): [Campaign!]!
     exportCampaign(options: CampaignExportInput!): JobRequest
     createCannedResponse(cannedResponse:CannedResponseInput!): CannedResponse
     createOrganization(name: String!, userId: String!, inviteId: String!): Organization

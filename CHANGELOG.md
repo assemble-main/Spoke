@@ -2,6 +2,203 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.1](https://github.com/politics-rewired/spoke/compare/v8.0.0...v8.0.1) (2024-02-15)
+
+
+### Bug Fixes
+
+* **mms:** get feature for max sms segment length ([#4](https://github.com/politics-rewired/spoke/issues/4)) ([f19b366](https://github.com/politics-rewired/spoke/commit/f19b366e2c83a742409756d6544644fed5dd274c))
+
+## [8.0.0](https://github.com/politics-rewired/spoke/compare/v7.3.0...v8.0.0) (2024-02-15)
+
+
+### Features
+
+* support sending mms without media ([#2](https://github.com/politics-rewired/spoke/issues/2)) ([3db7d25](https://github.com/politics-rewired/spoke/commit/3db7d25474601b087895be04aa2edc92d00bbb13))
+
+## [7.3.0](https://github.com/politics-rewired/spoke/compare/v7.2.0...v7.3.0) (2023-12-10)
+
+
+### Features
+
+* add generic title/content notice type ([#1677](https://github.com/politics-rewired/spoke/issues/1677)) ([adb168d](https://github.com/politics-rewired/spoke/commit/adb168d4036c4f086f6dbb54b4eacd1886bd5a5a))
+* use title/content notice type with envvar for rewired shutdown ([#1678](https://github.com/politics-rewired/spoke/issues/1678)) ([decedcc](https://github.com/politics-rewired/spoke/commit/decedcc394b77f4056f28ec2681e6047cc024a55))
+
+
+### Bug Fixes
+
+* handle spoke-portal being unreachable ([#1675](https://github.com/politics-rewired/spoke/issues/1675)) ([757b872](https://github.com/politics-rewired/spoke/commit/757b872d67255ce79235b36d0fa8a3e01593fba1))
+
+## [7.2.0](https://github.com/politics-rewired/spoke/compare/v7.2.0-rc.0...v7.2.0) (2023-11-14)
+
+
+### Features
+
+* add shutdown notification ([#1674](https://github.com/politics-rewired/spoke/issues/1674)) ([7f33625](https://github.com/politics-rewired/spoke/commit/7f33625203bb2067def7147ba3fb78f28839b215))
+
+## [7.2.0-rc.0](https://github.com/politics-rewired/spoke/compare/v7.1.0...v7.2.0-rc.0) (2023-09-12)
+
+
+### Features
+
+* view messaging service name on campaign details page for orgs with multiple msg services ([#1623](https://github.com/politics-rewired/spoke/issues/1623)) ([652b80c](https://github.com/politics-rewired/spoke/commit/652b80c1056093320feb8df00dccbb777d15130f))
+* **start-campaign-button:** warn before starting campaign without survey responses ([#1616](https://github.com/politics-rewired/spoke/issues/1616)) ([9bf1c57](https://github.com/politics-rewired/spoke/commit/9bf1c57d8905f10c7238e4b97c465ebcdbe6829a))
+* indicate new campaign id(s) from template ([#1629](https://github.com/politics-rewired/spoke/issues/1629)) ([0af2c75](https://github.com/politics-rewired/spoke/commit/0af2c75614c80a1208d0b3e1be049cfa377e6335))
+* **campaign-interaction-steps:** add save button to top of section ([#1610](https://github.com/politics-rewired/spoke/issues/1610)) ([0d035af](https://github.com/politics-rewired/spoke/commit/0d035af8130419392fe2055cede716a1e7d79aec))
+* **emails:** add email template with wrapper ([#1588](https://github.com/politics-rewired/spoke/issues/1588)) ([94fc8fa](https://github.com/politics-rewired/spoke/commit/94fc8fa18fbc7b43853cfb34c5c451efbd16cba7))
+
+
+### Bug Fixes
+
+* take campaign to edit link for create from template ([#1673](https://github.com/politics-rewired/spoke/issues/1673)) ([81ec582](https://github.com/politics-rewired/spoke/commit/81ec582b64aaef2638fba8f13cb94e0f38712714))
+* **update-dump:** add cap add flag ([#1668](https://github.com/politics-rewired/spoke/issues/1668)) ([46ddcb1](https://github.com/politics-rewired/spoke/commit/46ddcb129c3ed6f70eb467b75125e0444c5c83be))
+* create campaign speed dial open/close behavior ([#1627](https://github.com/politics-rewired/spoke/issues/1627)) ([d8428e3](https://github.com/politics-rewired/spoke/commit/d8428e3d06c69a2dd059fe48fb903bc8fd784716))
+* link toll free pricing ([#1653](https://github.com/politics-rewired/spoke/issues/1653)) ([37efeac](https://github.com/politics-rewired/spoke/commit/37efeac5efcce053ba0bf50f3e563450f9c58e80))
+* **users:** set preferred notification frequency on signup ([#1630](https://github.com/politics-rewired/spoke/issues/1630)) ([740e865](https://github.com/politics-rewired/spoke/commit/740e8659504f3708fa95061ccf3e7684f71493b5))
+
+
+### Backend Changes
+
+* **telco errors:** add 4785 error code ([#1667](https://github.com/politics-rewired/spoke/issues/1667)) ([053ea74](https://github.com/politics-rewired/spoke/commit/053ea748043e62d39c19a9f13ba71a0b6a52cc13))
+* add docker-compose instructions for local postgres ([#1599](https://github.com/politics-rewired/spoke/issues/1599)) ([fdc0793](https://github.com/politics-rewired/spoke/commit/fdc0793d17210bb4b91eaae8ae0bd8ca0c1c6f55))
+* run update schema dump ([#1666](https://github.com/politics-rewired/spoke/issues/1666)) ([68fb0fa](https://github.com/politics-rewired/spoke/commit/68fb0fa39a1267e7c51188f290fbc8418c7e0b1e))
+
+## [7.1.0](https://github.com/politics-rewired/spoke/compare/v7.0.0...v7.1.0) (2023-08-02)
+
+
+### Features
+
+* **10dlc:** add additional notices ([#1645](https://github.com/politics-rewired/spoke/issues/1645)) ([602e5d5](https://github.com/politics-rewired/spoke/commit/602e5d5bf523750d58995d55a7cf3a9405963224))
+
+
+### Bug Fixes
+
+* **canned responses:** default to alphabetical sorting ([#1647](https://github.com/politics-rewired/spoke/issues/1647)) ([7d53908](https://github.com/politics-rewired/spoke/commit/7d53908ceef1cba4bc8197a5171d0cc124e00a30))
+* **canned responses:** handle canned response moving up in the list ([#1646](https://github.com/politics-rewired/spoke/issues/1646)) ([0b9d2de](https://github.com/politics-rewired/spoke/commit/0b9d2de6d25ddc70878c3d7e8d24ee5614e177dc))
+* **csv mapping:** add autocomplete label ([#1649](https://github.com/politics-rewired/spoke/issues/1649)) ([480d078](https://github.com/politics-rewired/spoke/commit/480d078d2c97ab7e37f63ebaa78d577d25b7bc97))
+* **csv mapping:** rerender on file upload ([#1650](https://github.com/politics-rewired/spoke/issues/1650)) ([2c372ce](https://github.com/politics-rewired/spoke/commit/2c372ce00a2c45b2c87af53649959c629ea35d7b))
+
+
+### Backend Changes
+
+* **canned responses:** update form types ([#1648](https://github.com/politics-rewired/spoke/issues/1648)) ([b7238f0](https://github.com/politics-rewired/spoke/commit/b7238f0f14818cdafcbacce564544f74a110e373))
+* Add changelog for missing 6.1.3 release ([#1590](https://github.com/politics-rewired/spoke/issues/1590)) ([15a8122](https://github.com/politics-rewired/spoke/commit/15a8122800cc4f72012c2eb9030b6924af2297a4))
+
+## [7.0.0](https://github.com/politics-rewired/spoke/compare/v7.0.0-rc.1...v7.0.0) (2023-07-26)
+
+
+### Backend Changes
+
+* **csv mapping:** update required headers copy ([#1644](https://github.com/politics-rewired/spoke/issues/1644)) ([69a07ef](https://github.com/politics-rewired/spoke/commit/69a07efac9750b71164a0494d2b52463e13f3c23))
+
+## [7.0.0-rc.1](https://github.com/politics-rewired/spoke/compare/v7.0.0-rc.0...v7.0.0-rc.1) (2023-07-25)
+
+
+### Bug Fixes
+
+* **copy campaign:** copy display order for canned responses ([#1643](https://github.com/politics-rewired/spoke/issues/1643)) ([0cd4643](https://github.com/politics-rewired/spoke/commit/0cd46435567c789dca3cf4ebee0c6951a2519b60))
+
+## [7.0.0-rc.0](https://github.com/politics-rewired/spoke/compare/v6.4.0...v7.0.0-rc.0) (2023-07-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* allow uploading arbitrary csvs (#1540)
+
+### Features
+
+* add apollo graphql armor ([#1535](https://github.com/politics-rewired/spoke/issues/1535)) ([36a79c9](https://github.com/politics-rewired/spoke/commit/36a79c95547a816b7b97fabed79ce48758833b65))
+* **canned responses:** allow reordering display order ([#1551](https://github.com/politics-rewired/spoke/issues/1551)) ([9312d5f](https://github.com/politics-rewired/spoke/commit/9312d5f178226a39c95ca47fa3f017f271e40a51))
+* **canned responses:** clarify instructional copy ([#1571](https://github.com/politics-rewired/spoke/issues/1571)) ([862a354](https://github.com/politics-rewired/spoke/commit/862a35450fd280c882690b13880ae3d3f63da20d))
+* allow uploading arbitrary csvs ([#1540](https://github.com/politics-rewired/spoke/issues/1540)) ([9266776](https://github.com/politics-rewired/spoke/commit/926677621cbead5856032e93351cad0b7e3e410f))
+
+
+### Bug Fixes
+
+* **messaging services:** add org id to fakeservice sid ([#1607](https://github.com/politics-rewired/spoke/issues/1607)) ([3cee1d8](https://github.com/politics-rewired/spoke/commit/3cee1d82323a6131ca7251a5a0224d963dfe33b9))
+
+
+### Backend Changes
+
+* use more accurate variable naming ([#1576](https://github.com/politics-rewired/spoke/issues/1576)) ([21c7138](https://github.com/politics-rewired/spoke/commit/21c71386866de9f06516207c1dc1fb86c3834b8a))
+* **notification frequency:** update default to DAILY ([#1585](https://github.com/politics-rewired/spoke/issues/1585)) ([e76ade3](https://github.com/politics-rewired/spoke/commit/e76ade34444337d18e1aee56bc063dbcd702bf28))
+* **telco errors:** update with latest known descriptions ([#1635](https://github.com/politics-rewired/spoke/issues/1635)) ([e3b9e78](https://github.com/politics-rewired/spoke/commit/e3b9e7886f530c3c92101503f46a0c9f773b8916))
+
+## [6.4.0](https://github.com/politics-rewired/spoke/compare/v6.4.0-rc.0...v6.4.0) (2023-07-04)
+
+## [6.4.0-rc.0](https://github.com/politics-rewired/spoke/compare/v6.3.3...v6.4.0-rc.0) (2023-06-28)
+
+
+### Features
+
+* use new API to check if organization has a 10dlc service ([#1628](https://github.com/politics-rewired/spoke/issues/1628)) ([687be34](https://github.com/politics-rewired/spoke/commit/687be34f6c386472adfb168d80d7f692c7c40ed9))
+
+
+### Backend Changes
+
+* add july copy updates ([#1620](https://github.com/politics-rewired/spoke/issues/1620)) ([bc5d7eb](https://github.com/politics-rewired/spoke/commit/bc5d7ebcc8701c33347def434a497ae06d3aeaf4))
+* **people:** update remove users warning ([#1605](https://github.com/politics-rewired/spoke/issues/1605)) ([7a59705](https://github.com/politics-rewired/spoke/commit/7a59705ed853bbf58665a2fb4125e952e523fa79))
+* clarify shutdown email copy ([#1624](https://github.com/politics-rewired/spoke/issues/1624)) ([5c45c3e](https://github.com/politics-rewired/spoke/commit/5c45c3e97eb6f02778834e28f359666626c1d6f1))
+
+### [6.3.3](https://github.com/politics-rewired/spoke/compare/v6.3.2...v6.3.3) (2023-06-13)
+
+
+### Features
+
+* first draft of conventions doc ([#1615](https://github.com/politics-rewired/spoke/issues/1615)) ([ee9e38e](https://github.com/politics-rewired/spoke/commit/ee9e38e796c89e20c12f6da8ece9e0b37293e93d))
+
+
+### Backend Changes
+
+* **10dlc:** mid june notification update ([#1621](https://github.com/politics-rewired/spoke/issues/1621)) ([9884de0](https://github.com/politics-rewired/spoke/commit/9884de098b17b29424ce4deed5b8a5f8712e9abb))
+
+### [6.3.2](https://github.com/politics-rewired/spoke/compare/v6.3.1...v6.3.2) (2023-06-08)
+
+
+### Bug Fixes
+
+* **10dlc:** revert notification article link ([cbc054e](https://github.com/politics-rewired/spoke/commit/cbc054e0953a4f281a05c1a1c7b72d72e17c2771))
+
+### [6.3.1](https://github.com/politics-rewired/spoke/compare/v6.3.1-rc.0...v6.3.1) (2023-06-08)
+
+
+### Backend Changes
+
+* **10dlc:** update notifications ([#1606](https://github.com/politics-rewired/spoke/issues/1606)) ([8b79424](https://github.com/politics-rewired/spoke/commit/8b794243fe5d56acfde5034a8915a543a4d8801b))
+* add .tool-versions for asdf ([#1598](https://github.com/politics-rewired/spoke/issues/1598)) ([eddc9c3](https://github.com/politics-rewired/spoke/commit/eddc9c3bb44f71a28893ca6635d2f6b35a4d5cf5))
+
+### [6.3.1-rc.0](https://github.com/politics-rewired/spoke/compare/v6.3.0...v6.3.1-rc.0) (2023-05-24)
+
+
+### Bug Fixes
+
+* cannot save assign control max count ([#1617](https://github.com/politics-rewired/spoke/issues/1617)) ([2efe135](https://github.com/politics-rewired/spoke/commit/2efe135ffd8f7eca594e904d2b5bfd5c859cf7c8))
+
+## [6.3.0](https://github.com/politics-rewired/spoke/compare/v6.3.0-rc.1...v6.3.0) (2023-05-23)
+
+## [6.3.0-rc.1](https://github.com/politics-rewired/spoke/compare/v6.3.0-rc.0...v6.3.0-rc.1) (2023-05-17)
+
+
+### Bug Fixes
+
+* **autosending:** fetch campaign id when pausing ([#1611](https://github.com/politics-rewired/spoke/issues/1611)) ([da8772e](https://github.com/politics-rewired/spoke/commit/da8772e787082816cd28248e61832d6d5d097e54))
+
+## [6.3.0-rc.0](https://github.com/politics-rewired/spoke/compare/v6.2.0...v6.3.0-rc.0) (2023-05-17)
+
+
+### Features
+
+* support cross org copy campaign ([#1609](https://github.com/politics-rewired/spoke/issues/1609)) ([bf7ff4d](https://github.com/politics-rewired/spoke/commit/bf7ff4d132f661e5676e67175f694629f3ef3be7))
+
+## [6.2.0](https://github.com/politics-rewired/spoke/compare/v6.2.0-rc.2...v6.2.0) (2023-05-16)
+
+## [6.2.0-rc.2](https://github.com/politics-rewired/spoke/compare/v6.2.0-rc.1...v6.2.0-rc.2) (2023-05-10)
+
+
+### Bug Fixes
+
+* fix tollAlarms query ([#1602](https://github.com/politics-rewired/spoke/issues/1602)) ([cc27fc4](https://github.com/politics-rewired/spoke/commit/cc27fc42a98416f3a2f50d44360ea3237a319b9c))
+
 ## [6.2.0-rc.1](https://github.com/politics-rewired/spoke/compare/v6.2.0-rc.0...v6.2.0-rc.1) (2023-05-08)
 
 
@@ -29,6 +226,13 @@ All notable changes to this project will be documented in this file. See [standa
 * replace useless map with copy-on-destructure ([#1574](https://github.com/politics-rewired/spoke/issues/1574)) ([d13a4e7](https://github.com/politics-rewired/spoke/commit/d13a4e7ba51db400b095588ce5ede5c685bf6e23))
 * **knex:** resolve to v.2.3.0 ([#1539](https://github.com/politics-rewired/spoke/issues/1539)) ([4c68e7e](https://github.com/politics-rewired/spoke/commit/4c68e7ee46752af583d935a2d082078e8747d82d))
 * **message response:** convert to functional component ([#1541](https://github.com/politics-rewired/spoke/issues/1541)) ([b8b68dd](https://github.com/politics-rewired/spoke/commit/b8b68dd7f080114cf2a0babbe467e5f788c83d3b))
+
+### [6.1.3](https://github.com/politics-rewired/spoke/compare/v6.1.2...v6.1.3) (2023-04-21)
+
+
+### Bug Fixes
+
+* van configuration reading the wrong query ([3935821](https://github.com/politics-rewired/spoke/commit/3935821290124c3d28a5842ef439ce8a2ed8445c))
 
 ### [6.1.2](https://github.com/politics-rewired/spoke/compare/v6.1.1...v6.1.2) (2023-02-27)
 

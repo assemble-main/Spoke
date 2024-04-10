@@ -76,3 +76,26 @@ mutation UpdateAutosendingSettings(
     defaultAutosendingControlsMode
   }
 }
+
+query GetMessageSendingSettings($organizationId: String!) {
+  organization(id: $organizationId) {
+    id
+    settings {
+      id
+      maxSmsSegmentLength
+    }
+  }
+}
+
+mutation UpdateMessageSendingSettings(
+  $organizationId: String!
+  $maxSmsSegmentLength: Int
+) {
+  editOrganizationSettings(
+    id: $organizationId
+    input: { maxSmsSegmentLength: $maxSmsSegmentLength }
+  ) {
+    id
+    maxSmsSegmentLength
+  }
+}

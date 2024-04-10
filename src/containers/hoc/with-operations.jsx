@@ -5,6 +5,7 @@ import { branch, compose, renderComponent, withProps } from "recompose";
 
 import LoadingIndicator from "../../components/LoadingIndicator";
 import { replaceAll } from "../../lib/utils";
+import { isOrganizationsPermissionError } from "./utils";
 
 /**
  * This HOC takes a list of GraphQL query names and adds a loading prop that is true if any of the
@@ -101,5 +102,10 @@ export const loadData = (options) =>
   compose(
     withOperations(options),
     branch(({ loading }) => loading, renderComponent(LoadingIndicator)),
-    branch(({ errors }) => errors.length > 0, renderComponent(PrettyErrors))
+    branch(
+      ({ errors }) =>
+        errors.length > 0 &&
+        !isOrganizationsPermissionError(errors[0].graphQLErrors[0]),
+      renderComponent(PrettyErrors)
+    )
   );

@@ -6,7 +6,7 @@ import React from "react";
 
 interface QuickSearchToolbarProps {
   value: string;
-  onChange(): void;
+  onChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>;
   clearSearch(): void;
 }
 

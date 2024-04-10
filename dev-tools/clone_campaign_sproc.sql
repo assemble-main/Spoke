@@ -105,11 +105,12 @@ begin
   left join payloads parent_id_mapping on payloads.parent_interaction_id = parent_id_mapping.id;
 
   -- Copy canned responses
-  insert into canned_response (campaign_id, title, text)
+  insert into canned_response (campaign_id, title, text, display_order)
   select
     v_campaign.id as campaign_id,
     title,
-    text
+    text,
+    display_order
   from canned_response
   where campaign_id = template_id;
 

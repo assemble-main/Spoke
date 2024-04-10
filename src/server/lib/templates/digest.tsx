@@ -1,8 +1,10 @@
 import React from "react";
 import ReactDOMServer from "react-dom/server";
+import assemblePalette from "src/styles/assemble-palette";
 
 import type { CampaignRecord, OrganizationRecord } from "../../api/types";
 import { NotificationTypes } from "../../api/types";
+import TemplateWrapper from "./template-wrapper";
 
 interface FormattedNotification {
   notificationType: NotificationTypes;
@@ -20,6 +22,20 @@ interface DigestProps {
 interface NotificationContentProps {
   notification: FormattedNotification;
 }
+
+const styles = {
+  font: {
+    fontFamily: "Helvetica"
+  },
+  button: {
+    backgroundColor: assemblePalette.primary.navy,
+    padding: `12px 20px`,
+    border: "none",
+    color: "white",
+    borderRadius: 4,
+    marginBottom: 10
+  }
+};
 
 const AssignmentCreatedRow: React.FC<NotificationContentProps> = ({
   notification
@@ -73,19 +89,23 @@ const Digest: React.FC<DigestProps> = ({
   textingUrl,
   settingsUrl
 }) => {
+  const orgName = organization.name;
   return (
-    <div>
-      <p>You have outstanding text assignments from {organization.name}</p>
+    <TemplateWrapper organizationName={orgName} settingsUrl={settingsUrl}>
+      <p>Hello!</p>
+      <p>You have outstanding text assignments from {orgName}: </p>
       {notifications.map((notification) => renderDigestRow(notification))}
-      <p>
-        You can start sending texts right away here:{" "}
-        <a href={textingUrl}>{textingUrl}</a>
-      </p>
+      <button
+        type="button"
+        style={styles.button}
+        onClick={() => {
+          window.open(textingUrl);
+        }}
+      >
+        Send Now
+      </button>
       <br />
-      <p>
-        To modify your notification settings, go <a href={settingsUrl}>here</a>
-      </p>
-    </div>
+    </TemplateWrapper>
   );
 };
 

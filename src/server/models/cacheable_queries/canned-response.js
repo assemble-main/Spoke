@@ -32,7 +32,7 @@ export const cannedResponseCache = {
         campaign_id: parseInt(campaignId, 10),
         user_id: parseInt(userId, 10) || null
       })
-      .orderBy("title");
+      .orderBy("display_order");
     if (r.redis) {
       const cacheData = dbResult.map((cannedRes) => ({
         id: cannedRes.id,

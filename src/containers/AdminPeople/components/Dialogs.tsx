@@ -193,8 +193,8 @@ const ConfirmRemoveUsers: React.FC<ConfirmRemoveUsersProps> = ({
   <Dialog open={open} onClose={onClose}>
     <DialogTitle>Confirm Remove Users</DialogTitle>
     <DialogContent>
-      This will remove all users from the organization who are not Superadmins.
-      Are you sure you would like to do this?
+      This will remove all users from the organization who are not Superadmins
+      or Owners. Are you sure you would like to do this?
     </DialogContent>
     <DialogActions>
       <Button {...dataTest("removeUsersCancel")} onClick={onClose}>

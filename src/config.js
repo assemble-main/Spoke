@@ -115,6 +115,10 @@ const validators = {
     default: false,
     isClient: true
   }),
+  ENABLE_REWIRED_SHUTDOWN_NOTICE: bool({
+    desc: "Show the Rewired shutdown notice",
+    default: true
+  }),
   DISABLE_ASSIGNMENT_CASCADE: bool({
     desc:
       "Whether to just assign from 1 campaign rather than gathering from multiple to fulfill a request",
@@ -444,6 +448,12 @@ const validators = {
     desc:
       "A comma separated list of contact fields to not ship to the client. Can include 'external_id, cell, and lastName'",
     default: ""
+  }),
+  SHOW_10DLC_REGISTRATION_NOTICES: bool({
+    desc:
+      "Whether the 10DLC Registration Notices are displayed to Admins and Owners",
+    default: true,
+    isClient: true
   }),
   JOBS_SAME_PROCESS: bool({
     desc:

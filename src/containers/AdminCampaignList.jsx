@@ -1,11 +1,18 @@
 import { gql } from "@apollo/client";
+import { withStyles } from "@material-ui/core";
+import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import Snackbar from "@material-ui/core/Snackbar";
+import Typography from "@material-ui/core/Typography";
+import ClearIcon from "@material-ui/icons/Clear";
 import CreateIcon from "@material-ui/icons/Create";
 import FileCopyIcon from "@material-ui/icons/FileCopyOutlined";
+import MuiAlert from "@material-ui/lab/Alert";
+import AlertTitle from "@material-ui/lab/AlertTitle";
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
 import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
@@ -33,22 +40,54 @@ const styles = {
   }
 };
 
+const AdminCampaignListSpeedDialAction = withStyles(() => ({
+  staticTooltipLabel: {
+    display: "inline-block",
+    width: "max-content"
+  }
+}))(SpeedDialAction);
+
+const AdminCampaignListSpeedDial = withStyles(() => ({
+  root: {
+    "align-items": "flex-end"
+  }
+}))(SpeedDial);
+
+const AdminCampaignListSpeedDialIcon = withStyles(() => ({
+  root: {
+    display: "inline-box",
+    position: "relative",
+    width: "100%"
+  },
+  openIcon: {
+    width: "100%"
+  }
+}))(SpeedDialIcon);
+
 // The campaign list uses infinite scrolling now so we fix the page size
 const DEFAULT_PAGE_SIZE = 10;
 
 class AdminCampaignList extends React.Component {
-  state = {
-    speedDialOpen: false,
-    createFromTemplateOpen: false,
-    isCreating: false,
-    campaignsFilter: {
-      isArchived: false
-    },
-    releasingInProgress: false,
-    releasingAllReplies: false,
-    releaseAllRepliesError: undefined,
-    releaseAllRepliesResult: undefined
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      speedDialOpen: false,
+      createFromTemplateOpen: false,
+      // created from template state
+      showCreatedFromTemplateSnackbar: false,
+      createdFromTemplateIds: [],
+      createdFromTemplateTitle: "",
+      // end created from template state
+      isCreating: false,
+      campaignsFilter: {
+        isArchived: false
+      },
+      releasingInProgress: false,
+      releasingAllReplies: false,
+      releaseAllRepliesError: undefined,
+      releaseAllRepliesResult: undefined
+    };
+  }
 
   handleClickNewButton = async () => {
     const { history, match } = this.props;
@@ -82,8 +121,16 @@ class AdminCampaignList extends React.Component {
     });
   };
 
-  startReleasingAllReplies = () => {
-    this.setState({ releasingAllReplies: true });
+  handleCreatedFromTemplateSnackbarClose = (_event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    this.setState({
+      showCreatedFromTemplateSnackbar: false,
+      createdFromTemplateIds: [],
+      createdFromTemplateTitle: null
+    });
   };
 
   closeReleasingAllReplies = () => {
@@ -95,9 +142,53 @@ class AdminCampaignList extends React.Component {
     });
   };
 
-  handleClickSpeedDial = () => {
-    const { speedDialOpen } = this.state;
-    this.setState({ speedDialOpen: !speedDialOpen });
+  handleCreateTemplateCompleted = (copyCampaigns, selectedTemplateTitle) => {
+    if (copyCampaigns.length === 0) {
+      return;
+    }
+    this.setState({
+      showCreatedFromTemplateSnackbar: true,
+      createdFromTemplateIds: copyCampaigns.map((campaign) => campaign.id),
+      createdFromTemplateTitle: selectedTemplateTitle
+    });
+  };
+
+  handleCreateTemplateDialogClose = () => {
+    this.setState({ createFromTemplateOpen: false });
+  };
+
+  startReleasingAllReplies = () => {
+    this.setState({ releasingAllReplies: true });
+  };
+
+  handleOnCreateClickFromTemplate = () => {
+    this.setState({
+      createFromTemplateOpen: true,
+      speedDialOpen: false
+    });
+  };
+
+  handleSpeedDialOnKeyDown = (event) => {
+    /* "toggle", "blur", "mouseLeave", "escapeKeyDown" are the possible close events,
+      so we're handling escapeKeyDown here * */
+    if (event.key === "Escape") {
+      this.setState({ speedDialOpen: false });
+    }
+  };
+
+  handleSpeedDialOnFocus = () => {
+    this.setState({ speedDialOpen: true });
+  };
+
+  handleSpeedDialOnBlur = () => {
+    this.setState({ speedDialOpen: false });
+  };
+
+  /**
+   * We listen to mouse down because we don't close the speed dial menu right after opening it in the focus event
+   */
+  handleSpeedDialOnMouseDown = () => {
+    this.setState({ speedDialOpen: !this.state.speedDialOpen });
   };
 
   releaseAllReplies = () => {
@@ -149,11 +240,18 @@ class AdminCampaignList extends React.Component {
     const {
       campaignsFilter,
       releasingAllReplies,
-      releasingInProgress
+      releasingInProgress,
+      releaseAllRepliesResult,
+      releaseAllRepliesError,
+      createFromTemplateOpen,
+      createdFromTemplateIds,
+      createdFromTemplateTitle,
+      showCreatedFromTemplateSnackbar,
+      isCreating
     } = this.state;
 
     const doneReleasingReplies =
-      this.state.releaseAllRepliesResult || this.state.releaseAllRepliesError;
+      releaseAllRepliesResult || releaseAllRepliesError;
 
     const { organizationId } = this.props.match.params;
     const { isAdmin } = this.props;
@@ -175,15 +273,12 @@ class AdminCampaignList extends React.Component {
             <DialogContent>
               {releasingInProgress ? (
                 <LoadingIndicator />
-              ) : this.state.releaseAllRepliesError ? (
+              ) : releaseAllRepliesError ? (
+                <span>Error: {JSON.stringify(releaseAllRepliesError)}</span>
+              ) : releaseAllRepliesResult ? (
                 <span>
-                  Error: {JSON.stringify(this.state.releaseAllRepliesError)}
-                </span>
-              ) : this.state.releaseAllRepliesResult ? (
-                <span>
-                  Released {this.state.releaseAllRepliesResult.contactCount}{" "}
-                  replies on {this.state.releaseAllRepliesResult.campaignCount}{" "}
-                  campaigns
+                  Released {releaseAllRepliesResult.contactCount} replies on{" "}
+                  {releaseAllRepliesResult.campaignCount} campaigns
                 </span>
               ) : !doneReleasingReplies ? (
                 <div>
@@ -258,7 +353,7 @@ class AdminCampaignList extends React.Component {
             </DialogActions>
           </Dialog>
         )}
-        {this.state.isCreating ? (
+        {isCreating ? (
           <LoadingIndicator />
         ) : (
           <CampaignList
@@ -270,32 +365,104 @@ class AdminCampaignList extends React.Component {
         )}
 
         {isAdmin ? (
-          <SpeedDial
-            ariaLabel="SpeedDial example"
+          <AdminCampaignListSpeedDial
+            id="adminCampaignListSpeedDial"
+            ariaLabel="Open create campaign actions"
             style={theme.components.floatingButton}
-            icon={<SpeedDialIcon />}
-            onClick={this.handleClickSpeedDial}
-            onOpen={() => this.setState({ speedDialOpen: true })}
+            onFocus={this.handleSpeedDialOnFocus}
+            onMouseDown={this.handleSpeedDialOnMouseDown}
+            onBlur={this.handleSpeedDialOnBlur}
+            onKeyDown={this.handleSpeedDialOnKeyDown}
             open={this.state.speedDialOpen}
             direction="up"
+            FabProps={{ variant: "extended" }}
+            icon={
+              <AdminCampaignListSpeedDialIcon
+                icon={
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignContent: "center",
+                      justifyContent: "center"
+                    }}
+                  >
+                    <SpeedDialIcon />
+                    <Typography variant="button">
+                      {" "}
+                      Create a campaign{" "}
+                    </Typography>
+                  </Box>
+                }
+                openIcon={
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignContent: "center",
+                      justifyContent: "center"
+                    }}
+                  >
+                    <ClearIcon />
+                  </Box>
+                }
+              />
+            }
           >
-            <SpeedDialAction
+            <AdminCampaignListSpeedDialAction
               icon={<CreateIcon />}
-              tooltipTitle="Create Blank"
+              tooltipOpen
+              tooltipTitle="Create new campaign"
               onClick={this.handleClickNewButton}
             />
-            <SpeedDialAction
+            <AdminCampaignListSpeedDialAction
               icon={<FileCopyIcon />}
-              tooltipTitle="Create from Template"
-              onClick={() => this.setState({ createFromTemplateOpen: true })}
+              tooltipOpen
+              tooltipTitle="Create campaign from template"
+              onClick={this.handleOnCreateClickFromTemplate}
             />
-          </SpeedDial>
+          </AdminCampaignListSpeedDial>
         ) : null}
         <CreateCampaignFromTemplateDialog
           organizationId={organizationId}
-          open={this.state.createFromTemplateOpen}
-          onClose={() => this.setState({ createFromTemplateOpen: false })}
+          open={createFromTemplateOpen}
+          onClose={this.handleCreateTemplateDialogClose}
+          onCreateTemplateCompleted={this.handleCreateTemplateCompleted}
         />
+        <Snackbar
+          open={showCreatedFromTemplateSnackbar}
+          onClose={this.handleCreatedFromTemplateSnackbarClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <MuiAlert
+            elevation={6}
+            variant="filled"
+            severity="success"
+            onClose={this.handleCreatedFromTemplateSnackbarClose}
+          >
+            <AlertTitle>
+              Campaign{createdFromTemplateIds.length > 1 ? "s" : ""}{" "}
+              successfully created from template "{createdFromTemplateTitle}"
+            </AlertTitle>
+            <p>
+              Created campaign
+              {createdFromTemplateIds.length > 1 ? "s" : ""}:{" "}
+              {createdFromTemplateIds.map((id, i) => {
+                return (
+                  <span key={id}>
+                    {i > 0 && ", "}
+                    <a
+                      key={id}
+                      target="_blank"
+                      href={`${window.BASE_URL}/admin/${organizationId}/campaigns/${id}/edit`}
+                      rel="noreferrer"
+                    >
+                      Campaign {id}
+                    </a>
+                  </span>
+                );
+              })}
+            </p>
+          </MuiAlert>
+        </Snackbar>
       </div>
     );
   }

@@ -7,6 +7,7 @@ echo "Spinning up Postgres Docker container..."
 
 # Start the container in the background
 CONTAINER_ID=$(docker container run -d  \
+  --cap-add SYS_RESOURCE \
   --platform linux/amd64 \
   -p $PG_HOST_PORT:5432  \
   -e ALLOW_NOSSL=true \

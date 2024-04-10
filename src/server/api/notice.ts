@@ -1,31 +1,37 @@
-export interface Register10DlcBrandNotice {
-  id: string;
-  tcrBrandRegistrationUrl: string | null;
-}
+/* eslint-disable import/prefer-default-export */
+import type { Notice } from "@spoke/spoke-codegen";
 
-export type Notice = Register10DlcBrandNotice;
+import {
+  isPending10DlcCampaignNotice,
+  isPricing10DlcNotice,
+  isPricingTollFreeNotice,
+  isRegister10DlcBrandNotice,
+  isRegister10DlcCampaignNotice,
+  isTitleContentNotice
+} from "../../api/notice";
 
-export function isRegister10DlcBrandNotice(
-  obj: Notice
-): obj is Register10DlcBrandNotice {
-  return (
-    (obj as Register10DlcBrandNotice & Register10DlcBrandNotice)
-      .tcrBrandRegistrationUrl !== undefined
-  );
-}
-
+// explicitly setting typename
 export const resolvers = {
-  Register10DlcBrandNotice: {
-    id: (notice: Register10DlcBrandNotice) => notice.id,
-    tcrBrandRegistrationUrl: (notice: Register10DlcBrandNotice) =>
-      notice.tcrBrandRegistrationUrl
-  },
   Notice: {
     __resolveType(obj: Notice) {
+      if (isTitleContentNotice(obj)) {
+        return "TitleContentNotice";
+      }
       if (isRegister10DlcBrandNotice(obj)) {
         return "Register10DlcBrandNotice";
       }
-
+      if (isRegister10DlcCampaignNotice(obj)) {
+        return "Register10DlcCampaignNotice";
+      }
+      if (isPending10DlcCampaignNotice(obj)) {
+        return "Pending10DlcCampaignNotice";
+      }
+      if (isPricing10DlcNotice(obj)) {
+        return "Pricing10DlcNotice";
+      }
+      if (isPricingTollFreeNotice(obj)) {
+        return "PricingTollFreeNotice";
+      }
       return null;
     }
   }
