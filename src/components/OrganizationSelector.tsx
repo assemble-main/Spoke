@@ -6,8 +6,9 @@ import { useGetOrganizationsQuery } from "@spoke/spoke-codegen";
 import React, { useMemo, useState } from "react";
 
 export interface OrganizationSelectorProps {
-  orgId: string;
+  orgId?: string;
   onChange: (selectedOrgId: string) => Promise<void> | void;
+  style?: React.CSSProperties;
 }
 
 export const OrganizationSelector: React.FC<OrganizationSelectorProps> = (
@@ -43,14 +44,9 @@ export const OrganizationSelector: React.FC<OrganizationSelectorProps> = (
       onInputChange={(_event, newValue) => {
         setOrgInput(newValue);
       }}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          label="Organization"
-          helperText="Which organization?"
-        />
-      )}
+      renderInput={(params) => <TextField {...params} label="Organization" />}
       onChange={handleOrgSelected}
+      style={props.style ?? {}}
     />
   );
 };
