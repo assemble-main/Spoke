@@ -66,6 +66,9 @@ export const createMuiThemev1 = (theme: Partial<CustomTheme> = {}) => {
         disabled: theme.disabledTextColor || blueGrey[800],
         disabledBackground: theme.disabledBackgroundColor || grey[300]
       }
+    },
+    typography: {
+      fontFamily: "Karla"
     }
   });
 };
