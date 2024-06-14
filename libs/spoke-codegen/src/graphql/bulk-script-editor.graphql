@@ -17,11 +17,9 @@ query GetCampaignsBulkScriptEditor(
 }
 
 query GetScriptUpdateChanges(
-  $organizationId: String!
   $findAndReplace: BulkUpdateScriptInput!
 ) {
   bulkUpdateScriptChanges(
-    organizationId: $organizationId
     findAndReplace: $findAndReplace
   ) {
     id
@@ -32,11 +30,9 @@ query GetScriptUpdateChanges(
 }
 
 mutation BulkUpdateScript(
-  $organizationId: String!
   $findAndReplace: BulkUpdateScriptInput!
 ) {
   bulkUpdateScript(
-    organizationId: $organizationId
     findAndReplace: $findAndReplace
   ) {
     campaignId

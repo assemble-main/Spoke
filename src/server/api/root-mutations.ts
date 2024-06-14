@@ -1115,11 +1115,8 @@ const rootMutations = {
       return loaders.campaign.load(id);
     },
 
-    bulkUpdateScript: async (
-      _root,
-      { organizationId, findAndReplace },
-      { user }
-    ) => {
+    bulkUpdateScript: async (_root, { findAndReplace }, { user }) => {
+      const { organizationId } = findAndReplace;
       await accessRequired(user, organizationId, "OWNER");
 
       const scriptUpdatesResult = await r.knex.transaction(async (trx) => {

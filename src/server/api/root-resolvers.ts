@@ -442,11 +442,8 @@ const rootResolvers = {
         nextCampaignId
       };
     },
-    bulkUpdateScriptChanges: async (
-      _root,
-      { organizationId, findAndReplace },
-      { user }
-    ) => {
+    bulkUpdateScriptChanges: async (_root, { findAndReplace }, { user }) => {
+      const { organizationId } = findAndReplace;
       await accessRequired(user, organizationId, "OWNER");
 
       const steps = await r.knex.transaction((trx) => {

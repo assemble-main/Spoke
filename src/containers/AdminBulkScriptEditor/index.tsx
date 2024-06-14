@@ -18,9 +18,14 @@ import {
 import groupBy from "lodash/groupBy";
 import isEmpty from "lodash/isEmpty";
 import React, { useState } from "react";
+import type { RouteChildrenProps } from "react-router-dom";
 
 import { formatErrorMessage } from "../hoc/with-operations";
 import ChangesDialog from "./components/ChangesDialog";
+
+type AdminBulkScriptEditorProps = RouteChildrenProps<{
+  organizationId: string;
+}>;
 
 const PROTECTED_CHARACTERS = ["/"];
 
@@ -40,7 +45,10 @@ const styles = {
   }
 };
 
-const AdminBulkScriptEditor: React.FC = (props) => {
+const AdminBulkScriptEditor: React.FC<AdminBulkScriptEditorProps> = (props) => {
+  const organizationId = props.match?.params.organizationId;
+  if (!organizationId) return null;
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [result, setResult] = useState<any>(null);
@@ -68,7 +76,7 @@ const AdminBulkScriptEditor: React.FC = (props) => {
   } = useGetCampaignsBulkScriptEditorQuery({
     variables: {
       campaignsFilter,
-      organizationId: props.match.params.organizationId
+      organizationId
     }
   });
 
@@ -79,9 +87,9 @@ const AdminBulkScriptEditor: React.FC = (props) => {
       findAndReplace: {
         searchString,
         replaceString,
-        campaignIds: selectedCampaigns
-      },
-      organizationId: props.match.params.organizationId
+        campaignIds: selectedCampaigns,
+        organizationId
+      }
     }
   });
 
@@ -90,9 +98,9 @@ const AdminBulkScriptEditor: React.FC = (props) => {
       findAndReplace: {
         replaceString,
         searchString,
-        campaignIds: selectedCampaigns
-      },
-      organizationId: props.match.params.organizationId
+        campaignIds: selectedCampaigns,
+        organizationId
+      }
     }
   });
 
@@ -334,15 +342,25 @@ const AdminBulkScriptEditor: React.FC = (props) => {
           <DialogTitle>{`Updated ${result.length} Occurence(s)`}</DialogTitle>
           <DialogContent>
             <ul>
-              {result.map(({ campaignId, found, replaced }) => (
-                <li key={`${campaignId}|${found}|${replaced}`}>
-                  Campaign ID: {campaignId}
-                  <br />
-                  Found: <span style={styles.code}>{found}</span>
-                  <br />
-                  Replaced with: <span style={styles.code}>{replaced}</span>
-                </li>
-              ))}
+              {result.map(
+                ({
+                  campaignId,
+                  found,
+                  replaced
+                }: {
+                  campaignId: string;
+                  found: string;
+                  replaced: string;
+                }) => (
+                  <li key={`${campaignId}|${found}|${replaced}`}>
+                    Campaign ID: {campaignId}
+                    <br />
+                    Found: <span style={styles.code}>{found}</span>
+                    <br />
+                    Replaced with: <span style={styles.code}>{replaced}</span>
+                  </li>
+                )
+              )}
             </ul>
             {result.length === 0 && (
               <DialogContentText>
