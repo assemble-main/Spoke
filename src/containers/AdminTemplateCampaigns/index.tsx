@@ -1,6 +1,9 @@
-import Fab from "@material-ui/core/Fab";
 import { makeStyles } from "@material-ui/core/styles";
-import AddIcon from "@material-ui/icons/Add";
+import CreateIcon from "@material-ui/icons/Create";
+import LibraryAddOutlinedIcon from "@material-ui/icons/LibraryAddOutlined";
+import SpeedDial from "@material-ui/lab/SpeedDial";
+import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
+import SpeedDialIcon from "@material-ui/lab/SpeedDialIcon";
 import {
   GetTemplateCampaignsDocument,
   useCloneTemplateCampaignMutation,
@@ -8,9 +11,10 @@ import {
   useDeleteTemplateCampaignMutation,
   useGetTemplateCampaignsQuery
 } from "@spoke/spoke-codegen";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 
+import CreateCampaignFromLibraryDialog from "./components/CreateFromLibraryDialog";
 import TemplateCampaignRow from "./components/TemplateCampaignRow";
 
 const useStyles = makeStyles((theme) => ({
@@ -19,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(1)
     }
   },
-  fab: {
+  speedDial: {
     position: "absolute",
     bottom: theme.spacing(2),
     right: theme.spacing(2)
@@ -31,6 +35,9 @@ export const AdminTemplateCampaigns: React.FC = () => {
   const history = useHistory();
   const { organizationId } = useParams<{ organizationId: string }>();
 
+  const [speedDialOpen, setSpeedDialOpen] = useState<boolean>(false);
+  const [createFromLibrary, setCreateFromLibrary] = useState<boolean>(false);
+
   const { data, loading, error } = useGetTemplateCampaignsQuery({
     variables: { organizationId }
   });
@@ -39,9 +46,10 @@ export const AdminTemplateCampaigns: React.FC = () => {
     { query: GetTemplateCampaignsDocument, variables: { organizationId } }
   ];
 
+  // TODO - disable if loading?
   const [
     createTemplateCampaign,
-    { loading: createTemplateLoading }
+    { loading: _createTemplateLoading }
   ] = useCreateTemplateCampaignMutation({
     refetchQueries
   });
@@ -86,6 +94,10 @@ export const AdminTemplateCampaigns: React.FC = () => {
     });
   };
 
+  const toggleSpeedDial = () => {
+    setSpeedDialOpen(!speedDialOpen);
+  };
+
   return (
     <>
       {loading && "Loading..."}
@@ -103,15 +115,32 @@ export const AdminTemplateCampaigns: React.FC = () => {
           />
         ))}
       </div>
-      <Fab
-        color="primary"
-        className={classes.fab}
-        aria-label="add"
-        disabled={createTemplateLoading}
-        onClick={handleClickCreateTemplate}
+      <SpeedDial
+        ariaLabel="create-template-campaign-dial"
+        className={classes.speedDial}
+        icon={<SpeedDialIcon />}
+        onClick={toggleSpeedDial}
+        onOpen={() => setSpeedDialOpen(true)}
+        open={speedDialOpen}
+        direction="up"
       >
-        <AddIcon />
-      </Fab>
+        <SpeedDialAction
+          icon={<CreateIcon />}
+          tooltipTitle="Create Template"
+          onClick={handleClickCreateTemplate}
+        />
+        <SpeedDialAction
+          icon={<LibraryAddOutlinedIcon />}
+          tooltipTitle="Select from Library"
+          onClick={() => setCreateFromLibrary(true)}
+        />
+      </SpeedDial>
+
+      <CreateCampaignFromLibraryDialog
+        organizationId={organizationId}
+        open={createFromLibrary}
+        onClose={() => setCreateFromLibrary(false)}
+      />
     </>
   );
 };
